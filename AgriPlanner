@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriPlanner Pro - Simulatore Agricolo Modulare</title>
+  <style>
+    :root{
+      --bg:#f3efe5;--card:#fff;--soft:#fbfaf5;--text:#1f2a1f;--muted:#657065;--border:#d9d0bd;
+      --accent:#547a44;--accent2:#315f86;--danger:#a33b2f;--warn:#a86d1e;--ok:#2f7d46;
+      --shadow:0 12px 30px rgba(31,42,31,.08);--shadow2:0 18px 45px rgba(31,42,31,.13);--glass:rgba(255,255,255,.72);--gold:#c89538;--cream:#fffaf0;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:radial-gradient(circle at top left,#fff8df 0,#f3efe5 34%,#e9eddc 100%);color:var(--text);line-height:1.45}
+    header{position:relative;overflow:hidden;background:linear-gradient(135deg,#162917,#38572c 55%,#8a9c5c);color:white;padding:46px 18px 38px;text-align:center}header:before{content:'';position:absolute;inset:-80px;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.22),transparent 24%),radial-gradient(circle at 80% 10%,rgba(255,226,147,.18),transparent 22%);pointer-events:none} header h1{position:relative;margin:0 0 8px;font-size:clamp(34px,6vw,64px);letter-spacing:-.06em;line-height:.95} header p{position:relative;margin:0;opacity:.92}.hero-badges{position:relative;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px}.hero-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);padding:7px 10px;border-radius:999px;font-size:13px;font-weight:800}
+    main{max-width:1520px;margin:0 auto;padding:20px 14px 60px}.top-strip{display:grid;grid-template-columns:1.1fr repeat(4,1fr);gap:12px;margin:-34px 0 16px;position:relative;z-index:4}.top-tile{background:var(--glass);backdrop-filter:blur(14px);border:1px solid rgba(217,208,189,.75);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}.top-tile small{display:block;color:var(--muted);font-weight:800;margin-bottom:5px}.top-tile strong{font-size:20px;letter-spacing:-.03em}.jump-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.jump-row select{width:220px}.tabs{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:10;background:rgba(243,239,229,.96);backdrop-filter:blur(8px);padding:10px 0 14px;margin-bottom:12px}
+    .tab{border:1px solid var(--border);background:rgba(255,255,255,.86);color:var(--text);border-radius:999px;padding:9px 13px;font-weight:800;cursor:pointer;font-size:13px;transition:.15s}.tab:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(31,42,31,.08)}.tab.active{background:var(--accent);border-color:var(--accent);color:white}
+    .section{display:none}.section.active{display:block;animation:fadeIn .18s ease-out}@keyframes fadeIn{from{opacity:.25;transform:translateY(4px)}to{opacity:1;transform:none}}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:linear-gradient(180deg,#ffffff,#fffdf8);border:1px solid var(--border);border-radius:22px;padding:20px;box-shadow:var(--shadow);transition:.18s}.card:hover{box-shadow:var(--shadow2);transform:translateY(-1px)}.section-intro{grid-column:span 12;background:linear-gradient(135deg,#f8f4e9,#eef5e8);border:1px solid var(--border);border-radius:22px;padding:18px 20px;box-shadow:var(--shadow)}.section-intro h2{margin-bottom:6px}.section-intro p{margin:0;color:var(--muted)}
+    .span-2{grid-column:span 2}.span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-8{grid-column:span 8}.span-12{grid-column:span 12}
+    h2{margin:0 0 14px;font-size:20px;letter-spacing:-.02em}h3{margin:20px 0 10px;font-size:16px}.subhead{font-weight:800;color:var(--accent);margin:14px 0 8px}
+    label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;color:var(--muted);font-size:14px}label .q{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#edf3e9;color:var(--accent);font-size:12px;font-weight:900;margin-left:6px;cursor:help}.field-help{display:block;color:#7d8679;font-size:11px;margin:-5px 0 8px;line-height:1.35}.smart-note{display:inline-flex;align-items:center;gap:6px;background:#eef5f0;border:1px solid #bdd5c3;color:#2f5936;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;margin-left:6px}.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 18px}.step-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px}.step-card b{display:block;margin-bottom:5px}.step-card span{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:999px;background:var(--accent);color:white;font-weight:900;margin-right:6px}.mode-box{background:#fff8e8;border:1px solid #e7c985;border-radius:16px;padding:12px 14px;margin:12px 0;color:#6d4a12;font-size:13px}.preset-panel{background:#f6faf3;border:1px solid #c9dcc2;border-radius:16px;padding:12px 14px;margin-top:10px}.preset-panel b{color:#365a2f}.smart-flash{animation:smartFlash .85s ease-out}@keyframes smartFlash{0%{box-shadow:0 0 0 0 rgba(84,122,68,.45)}100%{box-shadow:0 0 0 8px rgba(84,122,68,0)}}input,select,textarea{width:170px;padding:9px 10px;border-radius:10px;border:1px solid var(--border);font-size:15px;background:#fffdf8;color:var(--text);text-align:right}select,textarea{text-align:left}textarea{width:100%;min-height:88px;resize:vertical}
+    input:focus,select:focus,textarea:focus{outline:2px solid rgba(84,122,68,.25);border-color:var(--accent);box-shadow:0 0 0 5px rgba(84,122,68,.08)}input:hover,select:hover,textarea:hover{border-color:#b8ad98}.hint{font-size:12px;color:var(--muted);margin-top:6px}.note{font-size:13px;color:var(--muted);margin-top:12px}.info{background:#eef5f0;border:1px solid #bdd5c3;border-radius:14px;padding:12px 14px;color:#2f5936;font-size:13px}.warn{background:#fff8e8;border:1px solid #e7c985;border-radius:14px;padding:12px 14px;color:#6d4a12;font-size:13px}.dangerbox{background:#fff0ee;border-color:#e3b5af;color:#812c23}.okbox{background:#eef8ef;border-color:#b8d8bc;color:#245d31}
+    .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.metric{background:linear-gradient(180deg,#fffdf7,#f7f4eb);border:1px solid var(--border);border-radius:18px;padding:16px;min-height:96px;position:relative;overflow:hidden}.metric:after{content:'';position:absolute;right:-22px;top:-22px;width:76px;height:76px;border-radius:50%;background:rgba(84,122,68,.08)}.metric small{display:block;color:var(--muted);margin-bottom:7px}.metric strong{font-size:24px;letter-spacing:-.03em}.metric span{display:block;font-size:12px;color:var(--muted);margin-top:5px}
+    .positive{color:var(--ok)}.negative{color:var(--danger)}.blue{color:var(--accent2)}table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px}th,td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:right;vertical-align:top}th:first-child,td:first-child{text-align:left}tfoot td{font-weight:900;background:var(--soft)}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}button{border:0;border-radius:13px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),#6f9059);color:white;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(84,122,68,.18)}button:hover{filter:brightness(.95)}button.secondary{background:#e7e1d2;color:var(--text)}button.bluebtn{background:var(--accent2)}button.danger{background:var(--danger)}
+    details{border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:var(--soft);margin-top:10px}summary{cursor:pointer;font-weight:900}details[open]{background:#fffdf7}.mini-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.mini-kpi{border:1px solid var(--border);border-radius:14px;background:#fff;padding:10px}.mini-kpi small{display:block;color:var(--muted);font-size:11px}.mini-kpi b{font-size:17px}.checklist{padding-left:18px;margin:8px 0}.checklist li{margin:5px 0}.soft-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:16px 0}.two{columns:2;column-gap:26px}.scenario-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chip{background:#fff;border:1px solid var(--border);border-radius:999px;padding:7px 10px;cursor:pointer;font-size:13px}.is-hidden{display:none!important}.empty-state{grid-column:span 12;background:#fffdf7;border:1px dashed #c9bfa8;border-radius:18px;padding:20px;color:var(--muted);text-align:center}.empty-state b{color:var(--text)}.species-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.species-badge{background:#eef5f0;border:1px solid #bdd5c3;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:900;color:#2f5936}.animal-card{position:relative}.animal-card:before{content:'🐾';position:absolute;right:16px;top:14px;opacity:.16;font-size:34px}.compact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.compact-grid label{margin:6px 0}
+    .wizard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.wizard-card{border:1px solid var(--border);background:var(--soft);border-radius:16px;padding:14px;cursor:pointer;transition:.15s}.wizard-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.wizard-card b{display:block;margin-bottom:6px}.wizard-card small{color:var(--muted)}
+    .report-box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:22px;line-height:1.55}.report-box h2{margin-top:20px}.report-box ul{margin-top:6px}.score{font-size:46px;font-weight:900;letter-spacing:-.05em}.score.good{color:var(--ok)}.score.mid{color:var(--warn)}.score.bad{color:var(--danger)}
+    @media(max-width:1100px){.top-strip{grid-template-columns:repeat(2,1fr);margin-top:-22px}.wizard-grid{grid-template-columns:repeat(2,1fr)}.span-2,.span-3,.span-4,.span-5,.span-6,.span-7,.span-8{grid-column:span 12}.metrics{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.top-strip{grid-template-columns:1fr}.wizard-grid{grid-template-columns:1fr}label{display:block}input,select{width:100%;margin-top:6px}.metrics{grid-template-columns:1fr}.tabs{position:static}.two{columns:1}}@media print{.tabs,.actions{display:none}.section{display:block!important;break-inside:avoid}.card{box-shadow:none}body{background:white}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>AgriPlanner Pro</h1>
+  <p>Formulario agricolo universale: pascolo, allevamento, colture, frutteti, bosco, agrivoltaico, strutture, tasse e cashflow</p>
+
+</header>
+<main>
+  <div class="top-strip">
+    <div class="top-tile"><small>Navigazione rapida</small><div class="jump-row"><select id="jumpSelect" onchange="switchTab(this.value)"><option value="sintesi">Sintesi</option><option value="wizard">Scenario guidato</option><option value="azienda">Azienda</option><option value="superfici">Superfici</option><option value="allevamento">Allevamento</option><option value="razze">Animali & specie</option><option value="alimentazione">Alimentazione</option><option value="colture">Colture</option><option value="frutteti">Frutteti</option><option value="bosco">Bosco</option><option value="agrivoltaico">Agrivoltaico</option><option value="strutture">Strutture</option><option value="tasse">Tasse</option><option value="cashflow">Cashflow</option><option value="rischi">Rischi</option><option value="report">Report</option><option value="fonti">Metodo & fonti</option><option value="scenari">Scenari</option></select><button class="secondary" onclick="generateReport(true)">Report</button></div></div>
+    <div class="top-tile"><small>Ricavi</small><strong id="topRicavi">€0</strong></div>
+    <div class="top-tile"><small>Netto</small><strong id="topNetto">€0</strong></div>
+    <div class="top-tile"><small>Score rischio</small><strong id="topScore">-</strong></div>
+    <div class="top-tile"><small>Payback</small><strong id="topPayback">-</strong></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab" data-tab="sintesi">Sintesi</button>
+    <button class="tab active" data-tab="wizard">Scenario guidato</button>
+    <button class="tab" data-tab="azienda">Azienda</button>
+    <button class="tab" data-tab="superfici">Superfici</button>
+    <button class="tab" data-tab="allevamento">Allevamento</button>
+    <button class="tab" data-tab="razze">Animali & specie</button>
+    <button class="tab" data-tab="alimentazione">Alimentazione</button>
+    <button class="tab" data-tab="colture">Colture</button>
+    <button class="tab" data-tab="frutteti">Frutteti</button>
+    <button class="tab" data-tab="bosco">Bosco</button>
+    <button class="tab" data-tab="agrivoltaico">Agrivoltaico</button>
+    <button class="tab" data-tab="strutture">Strutture</button>
+    <button class="tab" data-tab="tasse">Tasse</button>
+    <button class="tab" data-tab="cashflow">Cashflow</button>
+    <button class="tab" data-tab="rischi">Rischi</button>
+    <button class="tab" data-tab="report">Report</button>
+    <button class="tab" data-tab="fonti">Metodo & fonti</button>
+    <button class="tab" data-tab="scenari">Scenari</button>
+  </nav>
+
+  <section id="wizard" class="section active">
+    <div class="grid">
+      <div class="card span-12">
+        <h2>Scenario guidato: parti da un modello, poi lavori a mano</h2>
+        <p class="note">Questa sezione serve solo per creare una base iniziale. Non è obbligatoria: puoi ignorarla e compilare tutto manualmente.</p>
+        <div class="step-grid">
+          <div class="step-card"><b><span>1</span>Dati base</b><small>Inserisci ettari, budget, rischio e obiettivo.</small></div>
+          <div class="step-card"><b><span>2</span>Scegli modello</b><small>Clicca pascolo, bovini, frutteto, bosco, energia o misto.</small></div>
+          <div class="step-card"><b><span>3</span>Correggi i numeri</b><small>Vai nelle sezioni e sostituisci ogni stima con i tuoi dati reali.</small></div>
+        </div>
+        <div class="mode-box"><b>Importante:</b> parti da una scheda vuota. I numeri compaiono solo se li inserisci tu, scegli uno scenario guidato o carichi l’esempio demo. I preset sono scorciatoie, non verità. Ogni campo resta modificabile.</div>
+        <div class="actions"><button onclick="clearProject()">Parti da zero</button><button class="secondary" onclick="loadDemoProject()">Carica esempio demo</button><button class="secondary" onclick="switchTab('sintesi')">Vai alla sintesi</button></div>
+        <div class="wizard-grid">
+          <div class="wizard-card" onclick="applyWizardPreset('pascolo')"><b>Pascolo estensivo</b><small>Bovini/ovini/capre, foraggi, recinzioni, acqua e carico UBA.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('carne')"><b>Bovini da carne</b><small>Ingrasso, razze, alimentazione, macello, resa carcassa e vendita.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('vacca')"><b>Vacca-vitello</b><small>Mandria fattrice, tasso svezzamento, rimonta e capi da comprare.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('frutteto')"><b>Frutteto</b><small>Rese, impianto, anni improduttivi, raccolta e rischio scarto.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('bosco')"><b>Bosco</b><small>Legna, castagne, funghi, carbonio, costi forestali e vincoli.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('agrivoltaico')"><b>Agrivoltaico</b><small>Canone, impianto proprio, energia, O&M e ammortamento.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('misto')"><b>Azienda mista</b><small>Colture + allevamento + bosco + frutteto + contributi.</small></div>
+          <div class="wizard-card" onclick="applyWizardPreset('vendita')"><b>Vendita diretta</b><small>Carne, trasformazione, logistica, marketing, laboratorio e cashflow.</small></div>
+        </div>
+      </div>
+      <div class="card span-6">
+        <h2>Impostazioni rapide</h2>
+        <label>Superficie totale indicativa ha <input id="wizardHa" type="number" value="25" min="0" step="0.5"></label>
+        <label>Budget investimento iniziale € <input id="wizardBudget" type="number" value="50000" min="0" step="1000"></label>
+        <label>Propensione al rischio <select id="wizardRischio"><option value="prudente">Prudente</option><option value="medio">Media</option><option value="aggressivo">Aggressiva</option></select></label>
+        <label>Obiettivo <select id="wizardObiettivo"><option value="reddito">Reddito annuo</option><option value="patrimonio">Valore patrimoniale</option><option value="cashflow">Cashflow stabile</option><option value="brand">Brand/vendita diretta</option></select></label>
+        <label>Modalità preset <select id="smartMode"><option value="manuale">Manuale: le tendine non toccano i numeri</option><option value="assistita">Assistita: le tendine aggiornano i valori collegati</option></select></label>
+        <div class="preset-panel"><b>Come funziona ora</b><p class="hint">In manuale, cambiare “Angus”, “Biologico” o “Ciliegio” non modifica i campi economici. In assistita, invece, la tendina aggiorna automaticamente costi, rese e ricavi collegati. Puoi anche premere il pulsante qui sotto quando vuoi applicare i preset una sola volta.</p><div class="actions"><button class="secondary" onclick="applyAllSelectedPresets()">Applica preset dalle tendine attuali</button></div></div>
+      </div>
+      <div class="card span-6">
+        <h2>Consiglio automatico</h2>
+        <div id="wizardAdvice" class="info">Scegli un progetto per ricevere un consiglio operativo.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sintesi" class="section">
+    <div class="grid">
+      <div class="card span-12">
+        <h2>Cruscotto economico generale</h2>
+        <div class="metrics">
+          <div class="metric"><small>Ricavi annui</small><strong id="outRicavi">€0</strong><span>vendite + contributi + energia</span></div>
+          <div class="metric"><small>Costi annui</small><strong id="outCosti">€0</strong><span>operativi + ammortamenti</span></div>
+          <div class="metric"><small>Margine lordo</small><strong id="outMargine">€0</strong><span id="outMarginePct">0%</span></div>
+          <div class="metric"><small>Utile netto stimato</small><strong id="outNetto">€0</strong><span>dopo tasse impostate</span></div>
+          <div class="metric"><small>Payback investimento</small><strong id="outPayback">-</strong><span>anni su utile netto</span></div>
+        </div>
+        <div id="diagnosi" class="warn"></div>
+      </div>
+      <div class="card span-6"><h2>Ricavi per area</h2><table><tbody id="tabRicavi"></tbody></table></div>
+      <div class="card span-6"><h2>Costi per area</h2><table><tbody id="tabCosti"></tbody></table></div>
+      <div class="card span-12"><h2>Indicatori tecnici</h2><table><tbody id="tabIndicatori"></tbody></table><div class="actions"><button onclick="calcola()">Ricalcola</button><button class="secondary" onclick="clearProject()">Svuota progetto</button><button class="secondary" onclick="loadDemoProject()">Carica esempio demo</button><button class="secondary" onclick="window.print()">Stampa / PDF</button></div></div>
+    </div>
+  </section>
+
+  <section id="azienda" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Profilo azienda</h2>
+        <label>Nome scenario <input id="nomeScenario" type="text" value="Scenario agricolo base"></label>
+        <label>Regime produttivo <select id="regime"><option value="convenzionale">Convenzionale</option><option value="biologico">Biologico</option><option value="integrato">Produzione integrata</option><option value="biodinamico">Biodinamico</option></select></label>
+        <label>Tipo progetto <select id="tipoProgetto"><option value="misto">Misto agricolo-zootecnico</option><option value="solo_allevamento">Solo allevamento</option><option value="solo_colture">Solo colture</option><option value="frutticolo">Frutticolo</option><option value="forestale">Forestale</option><option value="energia">Agrivoltaico/energia</option></select></label>
+        <label>Orizzonte analisi anni <input id="anniAnalisi" type="number" value="10" min="1" step="1"></label>
+        <label>Inflazione costi %/anno <input id="inflazioneCosti" type="number" value="2.5" min="0" step="0.1"></label>
+        <label>Crescita prezzi vendita %/anno <input id="crescitaPrezzi" type="number" value="1.5" min="0" step="0.1"></label>
+      </div>
+      <div class="card span-4"><h2>Contributi generali</h2>
+        <label>PAC base €/ha <input id="pacBaseHa" type="number" value="0" min="0" step="10"></label>
+        <label>Premio bio/integrato €/ha <input id="premioRegimeHa" type="number" value="0" min="0" step="10"></label>
+        <label>Ecoschemi/pascolo €/ha <input id="ecoHa" type="number" value="0" min="0" step="10"></label>
+        <label>Altri contributi annui € <input id="altriContributi" type="number" value="0" min="0" step="100"></label>
+        <details><summary>Spiegazione</summary><p class="hint">Inserisci i contributi solo se li conosci o vuoi fare simulazioni. Il calcolatore non verifica automaticamente ammissibilità PAC, titoli, eco-schemi o bandi.</p></details>
+      </div>
+      <div class="card span-4"><h2>Vendita e canali</h2>
+        <label>Canale principale <select id="canaleVendita"><option value="diretta">Vendita diretta</option><option value="grossista">Grossista</option><option value="trasformazione">Trasformazione propria</option><option value="misto">Canale misto</option></select></label>
+        <label>Marketing €/anno <input id="marketing" type="number" value="0" min="0" step="100"></label>
+        <label>Commerciale/logistica €/anno <input id="logisticaCommerciale" type="number" value="1500" min="0" step="100"></label>
+        <label>Perdita/invenduto % <input id="invendutoPct" type="number" value="3" min="0" max="100" step="0.5"></label>
+      </div>
+    </div>
+  </section>
+
+  <section id="superfici" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Superfici principali</h2>
+        <label>Seminativi ha <input id="haSeminativi" type="number" value="10" min="0" step="0.1"></label>
+        <label>Prati/pascoli ha <input id="haPascoli" type="number" value="10" min="0" step="0.1"></label>
+        <label>Bosco ha <input id="haBosco" type="number" value="5" min="0" step="0.1"></label>
+        <label>Frutteto ha <input id="haFrutteto" type="number" value="2" min="0" step="0.1"></label>
+        <label>Oliveto/vigneto ha <input id="haPermanenti" type="number" value="0" min="0" step="0.1"></label>
+        <label>Fabbricati/corti ha <input id="haFabbricati" type="number" value="0.3" min="0" step="0.01"></label>
+      </div>
+      <div class="card span-4"><h2>Pascolabilità e resa foraggera</h2>
+        <label>% bosco pascolabile <input id="boscoPascolabilePct" type="number" value="30" min="0" max="100" step="1"></label>
+        <label>Resa pascolo t SS/ha <input id="resaPascoloSS" type="number" value="3.5" min="0" step="0.1"></label>
+        <label>Resa seminativo foraggero t SS/ha <input id="resaSeminativoSS" type="number" value="5" min="0" step="0.1"></label>
+        <label>Resa bosco pascolabile t SS/ha <input id="resaBoscoSS" type="number" value="0.8" min="0" step="0.1"></label>
+        <label>Efficienza utilizzo % <input id="effForaggioPct" type="number" value="55" min="0" max="100" step="1"></label>
+        <details><summary>Cosa significa sostanza secca?</summary><p class="hint">La sostanza secca è il cibo reale al netto dell’acqua. Fieno, erba, insilati e pascolo hanno umidità diverse: usare la SS rende confrontabili alimenti diversi.</p></details>
+      </div>
+      <div class="card span-4"><h2>Geometria e perimetri</h2>
+        <label>Area recintata ha <input id="areaRecintataHa" type="number" value="20" min="0" step="0.1"></label>
+        <label>Forma <select id="forma"><option value="compatta">Compatta/quadrata</option><option value="rettangolare">Rettangolare 2:1</option><option value="lunga">Lunga 4:1</option><option value="manuale">Perimetro manuale</option></select></label>
+        <label>Perimetro manuale m <input id="perimetroManuale" type="number" value="0" min="0" step="10"></label>
+        <label>Divisioni interne m <input id="divisioniInterneM" type="number" value="1000" min="0" step="10"></label>
+      </div>
+    </div>
+  </section>
+
+  <section id="allevamento" class="section">
+    <div class="grid">
+      <div id="cardBovini" class="card span-4 animal-card"><h2>Bovini da carne/latte</h2>
+        <label>Attiva bovini? <select id="attivaBovini"><option value="si">Sì</option><option value="no">No</option></select></label>
+        <label>Indirizzo bovino <select id="indirizzoBovino"><option value="carne_ingrasso">Carne - ingrasso</option><option value="vacca_vitello">Carne - vacca vitello</option><option value="linea_completa">Carne - linea completa</option><option value="latte">Latte</option><option value="misto">Misto</option></select></label>
+        <label>Capi venduti/anno <input id="boviniVenduti" type="number" value="20" min="0" step="1"></label>
+        <label>Costo acquisto capo € <input id="costoAcquistoBovino" type="number" value="1200" min="0" step="50"></label>
+        <label>Ricavo capo venduto € <input id="ricavoBovino" type="number" value="5000" min="0" step="50"></label>
+        <label>Mortalità/scarti % <input id="mortalitaBoviniPct" type="number" value="3" min="0" max="100" step="0.5"></label>
+      </div>
+      <div id="cardMandria" class="card span-4 animal-card"><h2>Mandria fattrice</h2>
+        <label>Vacche nutrici <input id="vaccheNutrici" type="number" value="0" min="0" step="1"></label>
+        <label>Tori <input id="tori" type="number" value="0" min="0" step="1"></label>
+        <label>Tasso svezzamento % <input id="tassoSvezzamento" type="number" value="85" min="0" max="100" step="1"></label>
+        <label>Rimonta trattenuta capi <input id="rimontaCapi" type="number" value="0" min="0" step="1"></label>
+        <label>Costo vacca/anno € <input id="costoVaccaAnno" type="number" value="850" min="0" step="50"></label>
+        <label>Costo toro/anno € <input id="costoToroAnno" type="number" value="1200" min="0" step="50"></label>
+      </div>
+      <div id="cardAltreSpecie" class="card span-4 animal-card"><h2>Altre specie</h2>
+        <label>Ovini n. <input id="oviniN" type="number" value="0" min="0" step="1"></label>
+        <label>Ricavo ovino €/anno <input id="ricavoOvino" type="number" value="0" min="0" step="10"></label>
+        <label>Costo ovino €/anno <input id="costoOvino" type="number" value="90" min="0" step="10"></label>
+        <label>Capre n. <input id="capreN" type="number" value="0" min="0" step="1"></label>
+        <label>Ricavo capra €/anno <input id="ricavoCapra" type="number" value="0" min="0" step="10"></label>
+        <label>Costo capra €/anno <input id="costoCapra" type="number" value="120" min="0" step="10"></label>
+        <label>Asini/cavalli n. <input id="equidiN" type="number" value="0" min="0" step="1"></label>
+        <label>Costo equide €/anno <input id="costoEquide" type="number" value="350" min="0" step="10"></label>
+        <div class="soft-divider"></div>
+        <label>UBA ovino <input id="ubaOvino" type="number" value="0.10" min="0" step="0.01"></label>
+        <label>UBA capra <input id="ubaCapra" type="number" value="0.10" min="0" step="0.01"></label>
+        <label>UBA equide <input id="ubaEquide" type="number" value="0.80" min="0" step="0.01"></label>
+      </div>
+      <div id="cardCostiZoo" class="card span-12"><h2>Costi zootecnici generali</h2><div class="grid">
+        <div class="span-3"><label>Veterinario €/capo bovino <input id="vetBovino" type="number" value="120" min="0" step="10"></label></div>
+        <div class="span-3"><label>Assicurazione €/capo <input id="assBovino" type="number" value="40" min="0" step="5"></label></div>
+        <div class="span-3"><label>Macello/lavorazione €/capo <input id="macelloBovino" type="number" value="500" min="0" step="25"></label></div>
+        <div class="span-3"><label>Trasporto €/capo <input id="trasportoBovino" type="number" value="150" min="0" step="10"></label></div>
+      </div></div>
+    </div>
+  </section>
+
+  <section id="razze" class="section">
+    <div class="grid">
+      <div id="animalEmptyState" class="empty-state is-hidden">
+        <b>Nessun animale inserito.</b><br>
+        Aggiungi bovini, ovini, capre o equidi nella sezione “Allevamento” e qui compariranno solo le schede utili.
+      </div>
+
+      <div class="card span-12">
+        <h2>Animali & specie</h2>
+        <p class="note">Questa sezione sostituisce la vecchia scheda “Razze bovine”. Ora puoi gestire profili tecnici diversi per bovini, ovini, capre ed equidi. I valori sono modificabili a mano.</p>
+        <label>Specie da dettagliare <select id="animalDetailSpecies"><option value="bovini">Bovini</option><option value="ovini">Ovini</option><option value="capre">Capre</option><option value="equidi">Equidi</option></select></label>
+        <div id="activeSpeciesBadges" class="species-badges"></div>
+      </div>
+
+      <div id="detailBovini" class="card span-4 animal-card species-detail">
+        <h2>Bovini</h2>
+        <label>Razza / tipo <select id="razzaBovina">
+          <option value="angus">Aberdeen Angus</option><option value="limousine">Limousine</option><option value="charolaise">Charolaise</option><option value="chianina">Chianina</option><option value="piemontese">Piemontese</option><option value="maremmana">Maremmana</option><option value="highland">Highland</option><option value="hereford">Hereford</option><option value="simmental">Simmental/Pezzata Rossa</option><option value="bruna">Bruna</option><option value="frisona">Frisona</option><option value="incrocio">Incrocio rustico</option><option value="custom">Personalizzata</option>
+        </select></label>
+        <label>Peso acquisto kg <input id="pesoAcquisto" type="number" value="280" min="0" step="5"></label>
+        <label>Età acquisto mesi <input id="etaAcquisto" type="number" value="8" min="0" step="1"></label>
+        <label>Età vendita mesi <input id="etaVendita" type="number" value="19" min="1" step="1"></label>
+        <label>IMG manuale kg/giorno <input id="imgManuale" type="number" value="0" min="0" step="0.05"></label>
+        <label>Resa carcassa manuale % <input id="resaCarcassaManuale" type="number" value="0" min="0" max="80" step="0.5"></label>
+      </div>
+
+      <div id="detailOvini" class="card span-4 animal-card species-detail">
+        <h2>Ovini</h2>
+        <label>Tipo ovino <select id="tipoOvino"><option value="carne">Carne / agnelli</option><option value="latte">Latte</option><option value="lana">Lana / manutenzione</option><option value="rustico">Rustico da pascolo</option></select></label>
+        <label>Peso medio kg <input id="pesoOvino" type="number" value="65" min="0" step="1"></label>
+        <label>Consumo SS % peso vivo <input id="consumoSSOvinoPct" type="number" value="2.8" min="0" step="0.1"></label>
+        <label>Litri acqua/giorno <input id="litriOvinoGiorno" type="number" value="5" min="0" step="0.5"></label>
+        <label>Veterinario €/capo/anno <input id="vetOvino" type="number" value="18" min="0" step="1"></label>
+        <label>Mortalità/scarti % <input id="mortalitaOvinoPct" type="number" value="3" min="0" max="100" step="0.5"></label>
+      </div>
+
+      <div id="detailCapre" class="card span-4 animal-card species-detail">
+        <h2>Capre</h2>
+        <label>Tipo capra <select id="tipoCapra"><option value="carne">Carne / capretti</option><option value="latte">Latte</option><option value="pulizia">Pulizia bosco/rovi</option><option value="rustica">Rustica da pascolo</option></select></label>
+        <label>Peso medio kg <input id="pesoCapra" type="number" value="55" min="0" step="1"></label>
+        <label>Consumo SS % peso vivo <input id="consumoSSCapraPct" type="number" value="3.0" min="0" step="0.1"></label>
+        <label>Litri acqua/giorno <input id="litriCapraGiorno" type="number" value="6" min="0" step="0.5"></label>
+        <label>Veterinario €/capo/anno <input id="vetCapra" type="number" value="20" min="0" step="1"></label>
+        <label>Mortalità/scarti % <input id="mortalitaCapraPct" type="number" value="4" min="0" max="100" step="0.5"></label>
+      </div>
+
+      <div id="detailEquidi" class="card span-4 animal-card species-detail">
+        <h2>Equidi</h2>
+        <label>Tipo equide <select id="tipoEquide"><option value="asino">Asino</option><option value="cavallo">Cavallo</option><option value="mulo">Mulo</option><option value="guardiania">Guardiania/compagnia</option></select></label>
+        <label>Peso medio kg <input id="pesoEquide" type="number" value="300" min="0" step="5"></label>
+        <label>Consumo SS % peso vivo <input id="consumoSSEquidePct" type="number" value="2.0" min="0" step="0.1"></label>
+        <label>Litri acqua/giorno <input id="litriEquideGiorno" type="number" value="25" min="0" step="1"></label>
+        <label>Maniscalco/cura piedi €/capo/anno <input id="maniscalcoEquide" type="number" value="180" min="0" step="10"></label>
+        <label>Veterinario €/capo/anno <input id="vetEquide" type="number" value="90" min="0" step="10"></label>
+      </div>
+
+      <div class="card span-4"><h2>Scheda tecnica</h2><div id="schedaRazza" class="info"></div></div>
+      <div class="card span-4"><h2>Output specie</h2><table><tbody id="tabRazza"></tbody></table></div>
+      <div class="card span-4"><h2>Note gestione</h2><div id="animalManagementNote" class="warn"></div></div>
+
+      <div class="card span-12"><h2>Guida rapida animali</h2><div class="two note">
+        <p><b>Bovini</b>: alta produzione e alto fabbisogno. Molto sensibili a costo foraggi, acqua, recinzioni e macello.</p>
+        <p><b>Ovini</b>: più leggeri, utili per pascolo fine e rotazioni, ma richiedono attenzione a parassiti, predazione e gestione gregge.</p>
+        <p><b>Capre</b>: ottime per rovi, bosco e vegetazione arbustiva, ma sono più difficili da contenere e richiedono recinzioni migliori.</p>
+        <p><b>Equidi</b>: utili come compagnia, lavoro leggero o guardiania in alcuni contesti, ma vanno considerati come costo se non generano ricavi.</p>
+      </div></div>
+    </div>
+  </section>
+
+  <section id="alimentazione" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Dieta e foraggi</h2>
+        <label>Dieta <select id="dieta"><option value="grassfed">Grass-fed pascolo+fieno</option><option value="grassfed_spinto">Grass-fed con fieno ottimo</option><option value="misto">Pascolo + cereali moderati</option><option value="intensivo">Finissaggio intensivo</option><option value="povero">Pascolo povero/marginale</option></select></label>
+        <label>Consumo SS % peso vivo <input id="consumoSSPct" type="number" value="2.35" min="0" step="0.05"></label>
+        <label>Peso ballone kg <input id="pesoBallone" type="number" value="450" min="1" step="10"></label>
+        <label>SS ballone % <input id="ssBallonePct" type="number" value="85" min="1" max="100" step="1"></label>
+        <label>Prezzo ballone € <input id="prezzoBallone" type="number" value="130" min="0" step="5"></label>
+        <label>Balloni manuali annui <input id="balloniManuali" type="number" value="0" min="0" step="1"></label>
+        <label>Scarto fieno/mangiatoia % <input id="scartoFienoPct" type="number" value="10" min="0" max="80" step="1"></label>
+        <label>Costo produzione fieno proprio €/ballone <input id="costoFienoProprio" type="number" value="0" min="0" step="5"></label>
+      </div>
+      <div class="card span-4"><h2>Mangimi e integrazioni</h2>
+        <label>Concentrati kg/capo/giorno <input id="kgConcentratiGiorno" type="number" value="0" min="0" step="0.1"></label>
+        <label>Costo concentrati €/kg <input id="costoConcentratiKg" type="number" value="0.45" min="0" step="0.01"></label>
+        <label>Minerali €/capo/anno <input id="mineraliCapo" type="number" value="35" min="0" step="5"></label>
+        <label>Lettiera €/capo/anno <input id="lettieraCapo" type="number" value="60" min="0" step="5"></label>
+      </div>
+      <div class="card span-4"><h2>Spiegazione dieta</h2><div id="schedaDieta" class="info"></div></div>
+    </div>
+  </section>
+
+  <section id="colture" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Seminativi / colture erbacee</h2>
+        <label>Coltura principale <select id="colturaTipo"><option value="grano">Grano tenero/duro</option><option value="mais">Mais</option><option value="orzo">Orzo</option><option value="soia">Soia</option><option value="erba_medica">Erba medica</option><option value="foraggio">Foraggio misto</option><option value="girasole">Girasole</option><option value="custom">Personalizzata</option></select></label>
+        <label>Ettari coltura <input id="haColtura" type="number" value="5" min="0" step="0.1"></label>
+        <label>Resa t/ha <input id="resaColturaTHa" type="number" value="5" min="0" step="0.1"></label>
+        <label>Prezzo €/t <input id="prezzoColturaT" type="number" value="220" min="0" step="10"></label>
+        <label>Costi variabili €/ha <input id="costiColturaHa" type="number" value="650" min="0" step="10"></label>
+        <label>Contoterzista €/ha <input id="contoterziColturaHa" type="number" value="250" min="0" step="10"></label>
+      </div>
+      <div class="card span-4"><h2>Seconda coltura / rotazione</h2>
+        <label>Attiva seconda coltura <select id="secondaColturaOn"><option value="no">No</option><option value="si">Sì</option></select></label>
+        <label>Ettari seconda coltura <input id="haColtura2" type="number" value="0" min="0" step="0.1"></label>
+        <label>Resa t/ha <input id="resaColtura2THa" type="number" value="3" min="0" step="0.1"></label>
+        <label>Prezzo €/t <input id="prezzoColtura2T" type="number" value="180" min="0" step="10"></label>
+        <label>Costi €/ha <input id="costiColtura2Ha" type="number" value="400" min="0" step="10"></label>
+      </div>
+      <div class="card span-4"><h2>Risultato colture</h2><table><tbody id="tabColture"></tbody></table><details><summary>Nota rese</summary><p class="hint">Le rese variano moltissimo per zona, suolo, annata, irrigazione, regime bio/convenzionale e tecnica colturale. Qui inserisci valori tuoi o preventivi reali.</p></details></div>
+    </div>
+  </section>
+
+  <section id="frutteti" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Frutteto principale</h2>
+        <label>Specie frutticola <select id="fruttoTipo"><option value="mele">Melo</option><option value="pere">Pero</option><option value="ciliegie">Ciliegio</option><option value="albicocche">Albicocco</option><option value="pesche">Pesco</option><option value="susine">Susino</option><option value="noci">Noce</option><option value="nocciole">Nocciolo</option><option value="castagne">Castagno</option><option value="olivo">Olivo</option><option value="vite">Vite</option><option value="custom">Personalizzato</option></select></label>
+        <label>Ettari frutteto <input id="haFruttetoCalc" type="number" value="2" min="0" step="0.1"></label>
+        <label>Resa q/ha <input id="resaFruttoQHa" type="number" value="180" min="0" step="5"></label>
+        <label>Prezzo €/q <input id="prezzoFruttoQ" type="number" value="65" min="0" step="5"></label>
+        <label>Costi gestione €/ha <input id="costiFruttoHa" type="number" value="4500" min="0" step="100"></label>
+        <label>Manodopera raccolta €/q <input id="raccoltaFruttoQ" type="number" value="12" min="0" step="1"></label>
+      </div>
+      <div class="card span-4"><h2>Impianto e ammortamento</h2>
+        <label>Costo impianto €/ha <input id="impiantoFruttoHa" type="number" value="25000" min="0" step="500"></label>
+        <label>Anni ammortamento <input id="ammFruttoAnni" type="number" value="15" min="1" step="1"></label>
+        <label>Anni improduttivi <input id="anniImproduttivi" type="number" value="3" min="0" step="1"></label>
+        <label>% produzione a regime <input id="produzioneRegimePct" type="number" value="100" min="0" max="100" step="5"></label>
+        <label>Rischio grandine/scarto % <input id="scartoFruttoPct" type="number" value="8" min="0" max="100" step="1"></label>
+      </div>
+      <div class="card span-4"><h2>Output frutteto</h2><table><tbody id="tabFrutteti"></tbody></table><details><summary>Spiegazione frutteti</summary><p class="hint">Il frutteto ha spesso alto reddito potenziale ma anche alto investimento, manodopera, rischio climatico, fitosanitario e volatilità prezzo. Per questo il calcolatore separa gestione annua e ammortamento impianto.</p></details></div>
+    </div>
+  </section>
+
+  <section id="bosco" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Gestione bosco</h2>
+        <label>Tipo bosco <select id="boscoTipo"><option value="ceduo">Ceduo</option><option value="alto_fusto">Alto fusto</option><option value="misto">Misto</option><option value="castagneto">Castagneto</option><option value="silvopascolo">Silvopascolo</option></select></label>
+        <label>Ettari bosco gestiti <input id="haBoscoCalc" type="number" value="5" min="0" step="0.1"></label>
+        <label>Ricavo legna €/ha/anno <input id="ricavoBoscoHa" type="number" value="120" min="0" step="10"></label>
+        <label>Costi gestione €/ha/anno <input id="costiBoscoHa" type="number" value="60" min="0" step="10"></label>
+        <label>Contributi forestali €/ha <input id="contributiBoscoHa" type="number" value="0" min="0" step="10"></label>
+      </div>
+      <div class="card span-4"><h2>Prodotti secondari</h2>
+        <label>Castagne/noci/frutti bosco € <input id="ricaviProdottiBosco" type="number" value="0" min="0" step="100"></label>
+        <label>Funghi/tartufi/permessi € <input id="ricaviFunghi" type="number" value="0" min="0" step="100"></label>
+        <label>Servizi ecosistemici/CO2 € <input id="ricaviCarbonio" type="number" value="0" min="0" step="100"></label>
+        <label>Manutenzione sentieri € <input id="costiSentieri" type="number" value="0" min="0" step="100"></label>
+      </div>
+      <div class="card span-4"><h2>Output bosco</h2><table><tbody id="tabBosco"></tbody></table><details><summary>Nota legale</summary><p class="hint">Tagli, conversioni, pascolo in bosco e trasformazioni forestali possono richiedere autorizzazioni. Verifica sempre regolamento forestale e vincoli locali.</p></details></div>
+    </div>
+  </section>
+
+  <section id="agrivoltaico" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Agrivoltaico / energia</h2>
+        <label>Modello <select id="agrivoltaicoModello"><option value="nessuno">Nessuno</option><option value="affitto">Affitto terreno a operatore</option><option value="proprio">Impianto proprio</option><option value="comunita">Comunità energetica</option></select></label>
+        <label>Ettari interessati <input id="haAgriFV" type="number" value="0" min="0" step="0.1"></label>
+        <label>Canone affitto €/ha/anno <input id="canoneAgriFVHa" type="number" value="2500" min="0" step="100"></label>
+        <label>Potenza MWp <input id="potenzaMWp" type="number" value="0" min="0" step="0.1"></label>
+        <label>Produzione MWh/MWp/anno <input id="mwhPerMWp" type="number" value="1200" min="0" step="50"></label>
+        <label>Prezzo energia €/MWh <input id="prezzoEnergiaMWh" type="number" value="90" min="0" step="5"></label>
+      </div>
+      <div class="card span-4"><h2>Costi e investimento</h2>
+        <label>Investimento FV €/MWp <input id="investFVMWp" type="number" value="800000" min="0" step="10000"></label>
+        <label>O&M €/MWp/anno <input id="omFVMWp" type="number" value="18000" min="0" step="1000"></label>
+        <label>Anni ammortamento FV <input id="ammFVAnni" type="number" value="25" min="1" step="1"></label>
+        <label>Perdita produttiva agricola % <input id="perditaAgricolaFVPct" type="number" value="10" min="0" max="100" step="1"></label>
+      </div>
+      <div class="card span-4"><h2>Output agrivoltaico</h2><table><tbody id="tabAgriFV"></tbody></table><details><summary>Spiegazione</summary><p class="hint">Se selezioni affitto, il ricavo è canone × ettari. Se selezioni impianto proprio, il ricavo è energia prodotta × prezzo, meno O&M e ammortamento.</p></details></div>
+    </div>
+  </section>
+
+  <section id="strutture" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Recinzioni</h2>
+        <label>Rete fissa €/m <input id="reteFissaM" type="number" value="8" min="0" step="0.1"></label>
+        <label>Elettrico interno €/m <input id="elettricoM" type="number" value="0.8" min="0" step="0.1"></label>
+        <label>Cancelli/angoli/tenditori € <input id="extraRecinti" type="number" value="2500" min="0" step="100"></label>
+        <label>Anni ammortamento recinti <input id="ammRecintiAnni" type="number" value="12" min="1" step="1"></label>
+        <label>Manutenzione recinti % <input id="manutRecintiPct" type="number" value="4" min="0" step="0.5"></label>
+      </div>
+      <div class="card span-4"><h2>Fabbricati e ricoveri</h2>
+        <label>Stalla/ricovero investimento € <input id="investStalla" type="number" value="0" min="0" step="1000"></label>
+        <label>Magazzino/fienile investimento € <input id="investFienile" type="number" value="0" min="0" step="1000"></label>
+        <label>Cella frigo/lab/spaccio € <input id="investLaboratorio" type="number" value="0" min="0" step="1000"></label>
+        <label>Anni ammortamento strutture <input id="ammStruttureAnni" type="number" value="20" min="1" step="1"></label>
+        <label>Manutenzione strutture €/anno <input id="manutStrutture" type="number" value="1000" min="0" step="100"></label>
+      </div>
+      <div class="card span-4"><h2>Macchine e acqua</h2>
+        <label>Macchine/attrezzature € <input id="investMacchine" type="number" value="20000" min="0" step="1000"></label>
+        <label>Anni ammortamento macchine <input id="ammMacchineAnni" type="number" value="10" min="1" step="1"></label>
+        <label>Gasolio/energia €/anno <input id="gasolioEnergia" type="number" value="2500" min="0" step="100"></label>
+        <label>Impianto acqua € <input id="investAcqua" type="number" value="2500" min="0" step="100"></label>
+        <label>Acqua €/m³ <input id="prezzoAcquaMc" type="number" value="1.8" min="0" step="0.1"></label>
+        <label>Litri/giorno bovino <input id="litriBovinoGiorno" type="number" value="55" min="0" step="1"></label>
+        <label>Litri/giorno vacca nutrice <input id="litriVaccaGiorno" type="number" value="45" min="0" step="1"></label>
+        <label>Litri/giorno equide <input id="litriEquideGiorno" type="number" value="25" min="0" step="1"></label>
+      </div>
+    </div>
+  </section>
+
+  <section id="tasse" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Tasse e oneri</h2>
+        <label>Metodo tasse <select id="metodoTasse"><option value="percentuale">Percentuale utile</option><option value="manuale">Importo manuale</option><option value="zero">Non calcolare</option></select></label>
+        <label>Aliquota fiscale % <input id="aliquotaFiscalePct" type="number" value="25" min="0" max="100" step="1"></label>
+        <label>Tasse manuali €/anno <input id="tasseManuali" type="number" value="0" min="0" step="100"></label>
+        <label>INPS/contributi €/anno <input id="inps" type="number" value="0" min="0" step="100"></label>
+        <label>Commercialista €/anno <input id="commercialista" type="number" value="1800" min="0" step="100"></label>
+      </div>
+      <div class="card span-4"><h2>Altri costi generali</h2>
+        <label>Assicurazioni aziendali €/anno <input id="assicurazioni" type="number" value="1200" min="0" step="100"></label>
+        <label>Burocrazia/certificazioni €/anno <input id="burocrazia" type="number" value="1500" min="0" step="100"></label>
+        <label>Manodopera valorizzata €/anno <input id="manodopera" type="number" value="0" min="0" step="500"></label>
+        <label>Imprevisti €/anno <input id="imprevisti" type="number" value="3000" min="0" step="100"></label>
+        <div class="soft-divider"></div>
+        <label>Kg N/UBA/anno stimati <input id="kgNPerUBA" type="number" value="70" min="0" step="5"></label>
+        <label>Limite N kg/ha/anno <input id="limiteNHa" type="number" value="170" min="0" step="5"></label>
+        <label>Superficie spandimento ha <input id="haSpandimento" type="number" value="20" min="0" step="0.1"></label>
+      </div>
+      <div class="card span-4"><h2>Output tasse</h2><table><tbody id="tabTasse"></tbody></table><details><summary>Nota fiscale</summary><p class="hint">È una simulazione gestionale. La fiscalità agricola reale dipende da forma giuridica, regime IVA, reddito agrario/dominicale, attività connesse, vendita diretta, trasformazione e consulenza fiscale.</p></details></div>
+    </div>
+  </section>
+
+  <section id="cashflow" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Distribuzione flussi</h2>
+        <label>Mese ricavi principali <select id="meseRicavi"><option value="1">Gennaio</option><option value="2">Febbraio</option><option value="3">Marzo</option><option value="4">Aprile</option><option value="5">Maggio</option><option value="6">Giugno</option><option value="7">Luglio</option><option value="8">Agosto</option><option value="9">Settembre</option><option value="10">Ottobre</option><option value="11">Novembre</option><option value="12">Dicembre</option></select></label>
+        <label>Mese acquisto animali/input <select id="meseCostiGrossi"><option value="1">Gennaio</option><option value="2">Febbraio</option><option value="3">Marzo</option><option value="4">Aprile</option><option value="5">Maggio</option><option value="6">Giugno</option><option value="7">Luglio</option><option value="8">Agosto</option><option value="9">Settembre</option><option value="10">Ottobre</option><option value="11">Novembre</option><option value="12">Dicembre</option></select></label>
+        <label>% ricavi incassati subito <input id="incassoSubitoPct" type="number" value="80" min="0" max="100" step="5"></label>
+        <label>% costi concentrati <input id="costiConcentratiPct" type="number" value="45" min="0" max="100" step="5"></label>
+      </div>
+      <div class="card span-8"><h2>Cashflow mensile</h2><table><thead><tr><th>Mese</th><th>Entrate</th><th>Uscite</th><th>Saldo</th><th>Cumulato</th></tr></thead><tbody id="tabCashflow"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="rischi" class="section">
+    <div class="grid">
+      <div class="card span-12">
+        <h2>Stress test e rischi</h2>
+        <p class="note">Qui il progetto viene stressato automaticamente: prezzi peggiori, costi più alti, rese inferiori, problemi sanitari o climatici.</p>
+        <div class="metrics">
+          <div class="metric"><small>Score progetto</small><strong id="riskScore" class="score">0</strong><span id="riskScoreText">-</span></div>
+          <div class="metric"><small>Scenario peggiore</small><strong id="worstScenario">€0</strong><span>utile netto</span></div>
+          <div class="metric"><small>Scenario migliore</small><strong id="bestScenario">€0</strong><span>utile netto</span></div>
+          <div class="metric"><small>Sensibilità fieno/costi</small><strong id="feedSensitivity">-</strong><span>impatto annuo</span></div>
+          <div class="metric"><small>Cash buffer consigliato</small><strong id="cashBuffer">€0</strong><span>liquidità minima</span></div>
+        </div>
+      </div>
+      <div class="card span-8"><h2>Tabella stress test</h2><table><thead><tr><th>Rischio simulato</th><th>Ricavi</th><th>Costi</th><th>Netto</th><th>Effetto</th></tr></thead><tbody id="tabStress"></tbody></table></div>
+      <div class="card span-4"><h2>Mappa rischi</h2><div id="riskMap" class="warn"></div></div>
+    </div>
+  </section>
+
+  <section id="report" class="section">
+    <div class="grid">
+      <div class="card span-12">
+        <h2>Report finale / mini business plan</h2>
+        <div class="actions"><button onclick="generateReport(true)">Genera report</button><button class="secondary" onclick="copyReport()">Copia testo</button><button class="secondary" onclick="window.print()">Stampa / salva PDF</button></div>
+      </div>
+      <div class="card span-12"><div id="businessReport" class="report-box">Premi “Genera report” per creare una scheda completa del progetto.</div></div>
+    </div>
+  </section>
+
+  <section id="fonti" class="section">
+    <div class="grid">
+      <div class="card span-12">
+        <h2>Metodo, attendibilità e fonti</h2>
+        <div class="info">
+          I valori precompilati sono stime operative pensate per simulare scenari. Non sono prezzi ufficiali né sostituiscono analisi aziendali, preventivi, consulenza agronomica, veterinaria, fiscale o autorizzativa. Dove possibile sono stati allineati a ordini di grandezza tratti da fonti istituzionali, scientifiche o report tecnici.
+        </div>
+      </div>
+      <div class="card span-6">
+        <h2>Fonti tecniche usate come riferimento</h2>
+        <table>
+          <tbody>
+            <tr><td>Consumo sostanza secca bovini</td><td><b>NRC / Iowa Beef Center / Oklahoma State Extension</b><br><span class="hint">Per vacche e bovini adulti l’assunzione è spesso nell’ordine di 1–3% del peso vivo in SS, variabile per qualità dieta e stato produttivo.</span></td></tr>
+            <tr><td>Resa carcassa bovini</td><td><b>AHDB Beef & Lamb / dati macellazione</b><br><span class="hint">La resa dipende da razza, sesso, stato di ingrassamento, digiuno, età, muscolosità e gestione al macello.</span></td></tr>
+            <tr><td>UBA / LSU</td><td><b>Eurostat - Livestock unit coefficients</b><br><span class="hint">Unità standard per confrontare specie diverse: bovini, ovini, caprini, equidi, suini e avicoli.</span></td></tr>
+            <tr><td>Costi e margini agricoli</td><td><b>CREA-RICA, ISMEA, CRPA</b><br><span class="hint">Per Italia: costi di produzione, dati economici aziendali, input zootecnici e analisi comparti.</span></td></tr>
+            <tr><td>Agrivoltaico / producibilità FV</td><td><b>JRC PVGIS e letteratura tecnico-scientifica</b><br><span class="hint">La producibilità reale va stimata con coordinate, inclinazione, ombreggiamenti, tecnologia e autorizzazioni.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card span-6">
+        <h2>Livelli di confidenza dei dati</h2>
+        <table>
+          <tbody>
+            <tr><td>Alta</td><td><b>Formule, perimetri geometrici, cashflow, ammortamenti, LSU/UBA ufficiali.</b></td></tr>
+            <tr><td>Media</td><td><b>Consumi alimentari, rese carcassa, peso vendita, fabbisogni idrici.</b><br><span class="hint">Vanno tarati su razza, alimentazione, clima e gestione.</span></td></tr>
+            <tr><td>Bassa / da preventivo</td><td><b>Prezzi, ricavi al capo, costo balloni, macello, recinzioni, canoni FV, costi frutteto.</b><br><span class="hint">Sono molto locali e temporali: inserire sempre preventivi reali.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card span-12">
+        <h2>Regola d’uso consigliata</h2>
+        <ul class="checklist">
+          <li>Usa i preset solo come partenza, poi sostituisci ogni prezzo con dati reali.</li>
+          <li>Crea almeno tre scenari: prudente, base, aggressivo.</li>
+          <li>Nel report finale indica sempre quali dati sono preventivi reali e quali sono stime.</li>
+          <li>Per investimenti grandi, valida il piano con tecnico agricolo, veterinario, commercialista e consulente energia.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="scenari" class="section">
+    <div class="grid">
+      <div class="card span-4"><h2>Salva scenario</h2><label>Nome scenario <input id="scenarioName" type="text" value="Scenario agricolo base"></label><div class="actions"><button onclick="salvaScenario()">Salva</button><button class="secondary" onclick="esportaJSON()">Esporta JSON</button><button class="secondary" onclick="document.getElementById('fileImport').click()">Importa JSON</button><input id="fileImport" type="file" accept="application/json" style="display:none" onchange="importaJSON(event)"></div><div id="scenarioList" class="scenario-list"></div></div>
+      <div class="card span-8"><h2>Confronto scenari automatico</h2><table><thead><tr><th>Simulazione</th><th>Ricavi</th><th>Costi</th><th>Netto</th><th>Payback</th></tr></thead><tbody id="tabScenarioAuto"></tbody></table><p class="hint">Confronta il caso base con variazioni automatiche: +20% ricavi, +20% costi, meno allevamento, più frutteto.</p></div>
+    </div>
+  </section>
+
+  <footer class="note">AgriPlanner Pro - singolo file HTML/CSS/JS pronto per GitHub Pages. Modello indicativo, non sostituisce tecnici, consulenti o verifiche normative.</footer>
+</main>
+
+<script>
+const defaults={};
+const razze={
+  angus:{nome:'Aberdeen Angus',img:.85,resa:56,uba:1,desc:'Razza molto commerciale per carne premium. Buona marezzatura, rusticità media-alta, adatta a grass-fed se il foraggio è di qualità. Crescita buona ma non estrema.'},
+  limousine:{nome:'Limousine',img:.95,resa:60,uba:1.05,desc:'Razza francese da carne, molto muscolosa, alta resa carcassa, buona efficienza. Richiede alimentazione curata per finissaggio ottimale.'},
+  charolaise:{nome:'Charolaise',img:1.0,resa:60,uba:1.1,desc:'Taglia grande, crescita elevata, ottima produzione di carne. Più esigente su alimentazione, spazi e gestione rispetto a razze rustiche.'},
+  chianina:{nome:'Chianina',img:.9,resa:58,uba:1.15,desc:'Razza italiana di grande taglia e pregio. Mercato specifico, animali imponenti, buona valorizzazione se venduta con brand forte.'},
+  piemontese:{nome:'Piemontese',img:.85,resa:62,uba:1,desc:'Razza italiana con resa carcassa molto alta e carne magra. Ottima per mercati di qualità, meno orientata alla marezzatura tipo Angus.'},
+  maremmana:{nome:'Maremmana',img:.65,resa:53,uba:.9,desc:'Molto rustica, adatta a pascolo estensivo e ambienti marginali. Crescita più lenta, ma forte identità territoriale.'},
+  highland:{nome:'Highland',img:.55,resa:52,uba:.8,desc:'Rusticissima, adatta a bosco, collina e gestione estensiva. Crescita lenta, ottima immagine commerciale se ben raccontata.'},
+  hereford:{nome:'Hereford',img:.8,resa:55,uba:.95,desc:'Rustica, docile, buona per pascolo. Carne valorizzabile ma meno nota in Italia rispetto ad Angus o razze francesi.'},
+  simmental:{nome:'Simmental / Pezzata Rossa',img:.8,resa:55,uba:1,desc:'Duplice attitudine carne-latte. Interessante in sistemi misti, buona taglia e adattabilità.'},
+  bruna:{nome:'Bruna',img:.65,resa:52,uba:.95,desc:'Più orientata al latte, utilizzabile per carne in incrocio o sistemi misti. Valorizzazione carne da valutare bene.'},
+  frisona:{nome:'Frisona',img:.6,resa:50,uba:1,desc:'Razza lattiera. Per carne conviene fare conti prudenziali: valore commerciale e resa inferiori rispetto a razze specializzate.'},
+  incrocio:{nome:'Incrocio rustico',img:.75,resa:55,uba:.95,desc:'Soluzione flessibile. Può essere molto valida se combina rusticità, fertilità e mercato locale.'},
+  custom:{nome:'Personalizzata',img:.8,resa:56,uba:1,desc:'Usa i valori manuali per simulare una razza o incrocio specifico.'}
+};
+const diete={grassfed:{factor:1,desc:'Pascolo e fieno. Costi mangime bassi, crescita media, forte coerenza per carne naturale o biologica.'},grassfed_spinto:{factor:1.12,desc:'Pascolo più fieno eccellente e gestione accurata. Migliora crescita senza cereali importanti.'},misto:{factor:1.2,desc:'Pascolo più integrazione moderata di cereali/proteici. Più crescita, più costi, meno “grass-fed puro”.'},intensivo:{factor:1.35,desc:'Finissaggio spinto. Crescita alta, costi alimentari alti, maggior dipendenza da mercato mangimi.'},povero:{factor:.72,desc:'Pascolo marginale o inverno difficile. Crescita lenta, più rischio di peso vendita basso.'}};
+const fmt=new Intl.NumberFormat('it-IT',{maximumFractionDigits:0});
+function euro(v,d=0){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',maximumFractionDigits:d,minimumFractionDigits:d}).format(isFinite(v)?v:0)}
+function num(id){const el=document.getElementById(id); return Number(el ? el.value : 0) || 0}
+function val(id){const el=document.getElementById(id); return el ? el.value : ''}
+function setVal(id,v){const e=document.getElementById(id); if(e)e.value=v}
+function pct(v){return (isFinite(v)?v:0).toFixed(1)+'%'} function row(k,v){return `<tr><td>${k}</td><td><b>${v}</b></td></tr>`}
+function capture(){const o={};document.querySelectorAll('input,select,textarea').forEach(e=>{if(e.id&&e.type!=='file')o[e.id]=e.value});return o} function apply(o){Object.entries(o).forEach(([k,v])=>setVal(k,v));calcola()}
+function perimetro(){const manual=num('perimetroManuale');if(val('forma')==='manuale'&&manual>0)return manual;const a=num('areaRecintataHa')*10000;if(a<=0)return 0;let r=1;if(val('forma')==='rettangolare')r=2;if(val('forma')==='lunga')r=4;const c=Math.sqrt(a/r);return 2*(c+c*r)}
+function taxOn(utile){if(val('metodoTasse')==='zero')return 0;if(val('metodoTasse')==='manuale')return num('tasseManuali');return Math.max(0,utile)*num('aliquotaFiscalePct')/100}
+function compute(override={}){const snap=capture();Object.entries(override).forEach(([k,v])=>setVal(k,v));
+  const haTot=num('haSeminativi')+num('haPascoli')+num('haBosco')+num('haFrutteto')+num('haPermanenti')+num('haFabbricati');
+  const haContributi=Math.max(0,haTot-num('haFabbricati'));
+  const contributi=haContributi*(num('pacBaseHa')+num('ecoHa')+(val('regime')==='biologico'||val('regime')==='integrato'||val('regime')==='biodinamico'?num('premioRegimeHa'):0))+num('altriContributi');
+
+  const raz=razze[val('razzaBovina')]||razze.angus; const diet=diete[val('dieta')]||diete.grassfed; const mesi=Math.max(0,num('etaVendita')-num('etaAcquisto')); const giorni=mesi*30.44; const img=num('imgManuale')>0?num('imgManuale'):raz.img*diet.factor; const pesoVend=num('pesoAcquisto')+img*giorni; const resa=num('resaCarcassaManuale')>0?num('resaCarcassaManuale'):raz.resa; const kgCarc=pesoVend*resa/100;
+  const bovOn=val('attivaBovini')==='si'; const bovVend=bovOn?num('boviniVenduti'):0; const vitelli=Math.max(0,num('vaccheNutrici')*num('tassoSvezzamento')/100-num('rimontaCapi')); const capiDaComprare=val('indirizzoBovino')==='carne_ingrasso'?bovVend:Math.max(0,bovVend-vitelli);
+  const ricBov=bovVend*num('ricavoBovino')*(1-num('mortalitaBoviniPct')/100); const costBov=capiDaComprare*num('costoAcquistoBovino')+bovVend*(num('vetBovino')+num('assBovino')+num('macelloBovino')+num('trasportoBovino'))+num('vaccheNutrici')*num('costoVaccaAnno')+num('tori')*num('costoToroAnno');
+  const ricAltre=num('oviniN')*num('ricavoOvino')*(1-num('mortalitaOvinoPct')/100)+num('capreN')*num('ricavoCapra')*(1-num('mortalitaCapraPct')/100); const costAltre=num('oviniN')*(num('costoOvino')+num('vetOvino'))+num('capreN')*(num('costoCapra')+num('vetCapra'))+num('equidiN')*(num('costoEquide')+num('vetEquide')+num('maniscalcoEquide')); 
+
+  const ssDisponibile=(num('haPascoli')*num('resaPascoloSS')+num('haSeminativi')*num('resaSeminativoSS')+num('haBosco')*num('boscoPascolabilePct')/100*num('resaBoscoSS'))*1000*num('effForaggioPct')/100;
+  const pesoMed=(num('pesoAcquisto')+pesoVend)/2; const ssBov=bovVend*pesoMed*num('consumoSSPct')/100*giorni+(num('vaccheNutrici')*520*.022+num('tori')*800*.022)*365; const ssAltre=(num('oviniN')*num('pesoOvino')*num('consumoSSOvinoPct')/100+num('capreN')*num('pesoCapra')*num('consumoSSCapraPct')/100+num('equidiN')*num('pesoEquide')*num('consumoSSEquidePct')/100)*365; const ssTot=ssBov+ssAltre; const ssFieno=Math.max(0,ssTot-ssDisponibile)*(1+num('scartoFienoPct')/100); const balloniStim=(num('pesoBallone')*num('ssBallonePct')/100)>0?ssFieno/(num('pesoBallone')*num('ssBallonePct')/100):0; const balloni=num('balloniManuali')>0?num('balloniManuali'):balloniStim; const prezzoBalloneEff=num('costoFienoProprio')>0?num('costoFienoProprio'):num('prezzoBallone'); const costForaggi=balloni*prezzoBalloneEff+bovVend*num('kgConcentratiGiorno')*giorni*num('costoConcentratiKg')+bovVend*(num('mineraliCapo')+num('lettieraCapo')); 
+
+  const ricColt=num('haColtura')*num('resaColturaTHa')*num('prezzoColturaT')+(val('secondaColturaOn')==='si'?num('haColtura2')*num('resaColtura2THa')*num('prezzoColtura2T'):0); const costColt=num('haColtura')*(num('costiColturaHa')+num('contoterziColturaHa'))+(val('secondaColturaOn')==='si'?num('haColtura2')*num('costiColtura2Ha'):0);
+  const qFrutto=num('haFruttetoCalc')*num('resaFruttoQHa')*num('produzioneRegimePct')/100*(1-num('scartoFruttoPct')/100); const ricFrutto=qFrutto*num('prezzoFruttoQ'); const costFrutto=num('haFruttetoCalc')*num('costiFruttoHa')+qFrutto*num('raccoltaFruttoQ')+num('haFruttetoCalc')*num('impiantoFruttoHa')/Math.max(1,num('ammFruttoAnni'));
+  const ricBosco=num('haBoscoCalc')*(num('ricavoBoscoHa')+num('contributiBoscoHa'))+num('ricaviProdottiBosco')+num('ricaviFunghi')+num('ricaviCarbonio'); const costBosco=num('haBoscoCalc')*num('costiBoscoHa')+num('costiSentieri');
+  let ricFV=0,costFV=0,investFV=0; if(val('agrivoltaicoModello')==='affitto'){ricFV=num('haAgriFV')*num('canoneAgriFVHa')} if(val('agrivoltaicoModello')==='proprio'||val('agrivoltaicoModello')==='comunita'){ricFV=num('potenzaMWp')*num('mwhPerMWp')*num('prezzoEnergiaMWh');investFV=num('potenzaMWp')*num('investFVMWp');costFV=num('potenzaMWp')*num('omFVMWp')+investFV/Math.max(1,num('ammFVAnni'))}
+
+  const peri=perimetro(); const investRec=peri*num('reteFissaM')+num('divisioniInterneM')*num('elettricoM')+num('extraRecinti'); const costRec=investRec/Math.max(1,num('ammRecintiAnni'))+investRec*num('manutRecintiPct')/100; const investStr=num('investStalla')+num('investFienile')+num('investLaboratorio'); const costStr=investStr/Math.max(1,num('ammStruttureAnni'))+num('manutStrutture'); const costMac=num('investMacchine')/Math.max(1,num('ammMacchineAnni'))+num('gasolioEnergia'); const mcAcqua=(bovVend*num('litriBovinoGiorno')+num('vaccheNutrici')*num('litriVaccaGiorno')+num('tori')*65+num('oviniN')*num('litriOvinoGiorno')+num('capreN')*num('litriCapraGiorno')+num('equidiN')*num('litriEquideGiorno'))*365/1000; const costAcqua=num('investAcqua')/10+mcAcqua*num('prezzoAcquaMc');
+  const costGenerali=num('marketing')+num('logisticaCommerciale')+num('commercialista')+num('inps')+num('assicurazioni')+num('burocrazia')+num('manodopera')+num('imprevisti');
+  const ricavi=(ricBov+ricAltre+ricColt+ricFrutto+ricBosco+ricFV+contributi)*(1-num('invendutoPct')/100); const costi=costBov+costAltre+costForaggi+costColt+costFrutto+costBosco+costFV+costRec+costStr+costMac+costAcqua+costGenerali; const margine=ricavi-costi; const tasse=taxOn(margine); const netto=margine-tasse; const investimento=investRec+investStr+num('investMacchine')+num('investAcqua')+investFV+num('haFruttetoCalc')*num('impiantoFruttoHa'); const payback=netto>0?investimento/netto:Infinity; const uba=bovVend*raz.uba*(giorni/365)+num('vaccheNutrici')+num('tori')*1.2+num('oviniN')*num('ubaOvino')+num('capreN')*num('ubaCapra')+num('equidiN')*num('ubaEquide'); const ubaHa=(num('haPascoli')+num('haSeminativi')+num('haBosco')*num('boscoPascolabilePct')/100)>0?uba/(num('haPascoli')+num('haSeminativi')+num('haBosco')*num('boscoPascolabilePct')/100):0; const kgNHa=num('haSpandimento')>0?(uba*num('kgNPerUBA'))/num('haSpandimento'):0;
+  restore(snap); return {haTot,haContributi,contributi,raz,diet,img,pesoVend,resa,kgCarc,bovVend,vitelli,capiDaComprare,ricBov,costBov,ricAltre,costAltre,ssDisponibile,ssTot,balloni,ricColt,costColt,qFrutto,ricFrutto,costFrutto,ricBosco,costBosco,ricFV,costFV,investFV,peri,investRec,costRec,investStr,costStr,costMac,mcAcqua,costAcqua,costGenerali,ricavi,costi,margine,tasse,netto,investimento,payback,uba,ubaHa,kgNHa,costForaggi};}
+function restore(o){Object.entries(o).forEach(([k,v])=>setVal(k,v))}
+function smartSet(id,value){const el=document.getElementById(id); if(!el)return; el.value=value; el.classList.remove('smart-flash'); void el.offsetWidth; el.classList.add('smart-flash')}
+function applyAllSelectedPresets(){
+  ['regime','tipoProgetto','canaleVendita','indirizzoBovino','razzaBovina','dieta','colturaTipo','fruttoTipo','boscoTipo','agrivoltaicoModello'].forEach(id=>applySmartPreset(id,true));
+  calcola();
+}
+function applySmartPreset(source, force=false){
+  if(!force && val('smartMode')!=='assistita') return;
+  const regimePresets={
+    convenzionale:{premioRegimeHa:0,burocrazia:1200,costiColturaHa:650,costiFruttoHa:4500,ricavoBovino:5000,prezzoBallone:120,invendutoPct:3},
+    biologico:{premioRegimeHa:220,burocrazia:2200,costiColturaHa:780,costiFruttoHa:5600,ricavoBovino:5800,prezzoBallone:150,invendutoPct:4},
+    integrato:{premioRegimeHa:90,burocrazia:1700,costiColturaHa:700,costiFruttoHa:5000,ricavoBovino:5300,prezzoBallone:130,invendutoPct:3},
+    biodinamico:{premioRegimeHa:260,burocrazia:2800,costiColturaHa:850,costiFruttoHa:6200,ricavoBovino:6200,prezzoBallone:165,invendutoPct:5}
+  };
+  const projectPresets={
+    misto:{attivaBovini:'si',haSeminativi:8,haPascoli:8,haBosco:5,haFrutteto:2,haFruttetoCalc:2,haColtura:5,agrivoltaicoModello:'nessuno'},
+    solo_allevamento:{attivaBovini:'si',haSeminativi:6,haPascoli:14,haBosco:4,haFrutteto:0,haFruttetoCalc:0,haColtura:0,areaRecintataHa:20},
+    solo_colture:{attivaBovini:'no',boviniVenduti:0,vaccheNutrici:0,tori:0,haSeminativi:22,haPascoli:1,haBosco:1,haFrutteto:0,haFruttetoCalc:0,haColtura:18},
+    frutticolo:{attivaBovini:'no',boviniVenduti:0,haFrutteto:8,haFruttetoCalc:8,haSeminativi:4,haPascoli:0,haBosco:2,investLaboratorio:12000},
+    forestale:{attivaBovini:'no',boviniVenduti:0,haBosco:20,haBoscoCalc:20,haSeminativi:2,haPascoli:2,haFrutteto:0,haFruttetoCalc:0},
+    energia:{attivaBovini:'no',boviniVenduti:0,agrivoltaicoModello:'affitto',haAgriFV:8,haSeminativi:10,haPascoli:2,haBosco:2}
+  };
+  const channelPresets={
+    diretta:{ricavoBovino:5800,marketing:2500,logisticaCommerciale:3500,invendutoPct:5,investLaboratorio:12000,macelloBovino:650},
+    grossista:{ricavoBovino:3600,marketing:250,logisticaCommerciale:1200,invendutoPct:1,investLaboratorio:0,macelloBovino:300},
+    trasformazione:{ricavoBovino:6500,marketing:4500,logisticaCommerciale:4500,invendutoPct:7,investLaboratorio:35000,macelloBovino:750},
+    misto:{ricavoBovino:5000,marketing:1500,logisticaCommerciale:2500,invendutoPct:4,investLaboratorio:7000,macelloBovino:500}
+  };
+  const bovinePresets={
+    carne_ingrasso:{vaccheNutrici:0,tori:0,costoAcquistoBovino:1200,boviniVenduti:20,etaAcquisto:8,etaVendita:19,ricavoBovino:5000},
+    vacca_vitello:{vaccheNutrici:20,tori:1,costoAcquistoBovino:0,boviniVenduti:16,etaAcquisto:0,etaVendita:8,ricavoBovino:950},
+    linea_completa:{vaccheNutrici:20,tori:1,costoAcquistoBovino:0,boviniVenduti:16,etaAcquisto:8,etaVendita:20,ricavoBovino:5500},
+    latte:{vaccheNutrici:0,tori:0,boviniVenduti:0,ricavoBovino:0,vetBovino:180,assBovino:60,kgConcentratiGiorno:6},
+    misto:{vaccheNutrici:12,tori:1,boviniVenduti:10,costoAcquistoBovino:600,ricavoBovino:4500}
+  };
+  const breedPresets={
+    angus:{pesoAcquisto:280,etaAcquisto:8,etaVendita:19,ricavoBovino:5600,costoAcquistoBovino:1350,consumoSSPct:2.35},
+    limousine:{pesoAcquisto:310,etaAcquisto:8,etaVendita:18,ricavoBovino:5400,costoAcquistoBovino:1450,consumoSSPct:2.45},
+    charolaise:{pesoAcquisto:330,etaAcquisto:8,etaVendita:18,ricavoBovino:5500,costoAcquistoBovino:1500,consumoSSPct:2.5},
+    chianina:{pesoAcquisto:330,etaAcquisto:9,etaVendita:22,ricavoBovino:6500,costoAcquistoBovino:1700,consumoSSPct:2.55},
+    piemontese:{pesoAcquisto:280,etaAcquisto:8,etaVendita:18,ricavoBovino:5800,costoAcquistoBovino:1500,consumoSSPct:2.35},
+    maremmana:{pesoAcquisto:240,etaAcquisto:8,etaVendita:24,ricavoBovino:5200,costoAcquistoBovino:1100,consumoSSPct:2.25},
+    highland:{pesoAcquisto:210,etaAcquisto:10,etaVendita:30,ricavoBovino:4800,costoAcquistoBovino:1000,consumoSSPct:2.15},
+    hereford:{pesoAcquisto:270,etaAcquisto:8,etaVendita:20,ricavoBovino:5000,costoAcquistoBovino:1200,consumoSSPct:2.35},
+    simmental:{pesoAcquisto:300,etaAcquisto:8,etaVendita:20,ricavoBovino:4800,costoAcquistoBovino:1150,consumoSSPct:2.45},
+    bruna:{pesoAcquisto:260,etaAcquisto:8,etaVendita:20,ricavoBovino:3900,costoAcquistoBovino:900,consumoSSPct:2.35},
+    frisona:{pesoAcquisto:250,etaAcquisto:8,etaVendita:19,ricavoBovino:3300,costoAcquistoBovino:700,consumoSSPct:2.35},
+    incrocio:{pesoAcquisto:270,etaAcquisto:8,etaVendita:20,ricavoBovino:4700,costoAcquistoBovino:1050,consumoSSPct:2.35}
+  };
+  const dietPresets={
+    grassfed:{kgConcentratiGiorno:0,prezzoBallone:135,consumoSSPct:2.35,etaVendita:20,ricavoBovino:5600},
+    grassfed_spinto:{kgConcentratiGiorno:0,prezzoBallone:155,consumoSSPct:2.45,etaVendita:19,ricavoBovino:5900},
+    misto:{kgConcentratiGiorno:2,prezzoBallone:125,consumoSSPct:2.4,etaVendita:18,ricavoBovino:5400},
+    intensivo:{kgConcentratiGiorno:5,prezzoBallone:110,consumoSSPct:2.55,etaVendita:16,ricavoBovino:5200},
+    povero:{kgConcentratiGiorno:0,prezzoBallone:105,consumoSSPct:2.15,etaVendita:26,ricavoBovino:4200}
+  };
+  const cropPresets={
+    grano:{resaColturaTHa:5.2,prezzoColturaT:240,costiColturaHa:720,contoterziColturaHa:260},
+    mais:{resaColturaTHa:10.5,prezzoColturaT:210,costiColturaHa:1250,contoterziColturaHa:360},
+    orzo:{resaColturaTHa:4.8,prezzoColturaT:210,costiColturaHa:620,contoterziColturaHa:240},
+    soia:{resaColturaTHa:3.2,prezzoColturaT:440,costiColturaHa:760,contoterziColturaHa:290},
+    erba_medica:{resaColturaTHa:8,prezzoColturaT:165,costiColturaHa:520,contoterziColturaHa:280,resaSeminativoSS:7},
+    foraggio:{resaColturaTHa:7,prezzoColturaT:130,costiColturaHa:450,contoterziColturaHa:220,resaSeminativoSS:6},
+    girasole:{resaColturaTHa:2.8,prezzoColturaT:410,costiColturaHa:620,contoterziColturaHa:260}
+  };
+  const fruitPresets={
+    mele:{resaFruttoQHa:450,prezzoFruttoQ:45,costiFruttoHa:9000,raccoltaFruttoQ:10,impiantoFruttoHa:42000,ammFruttoAnni:18,anniImproduttivi:3,scartoFruttoPct:8},
+    pere:{resaFruttoQHa:330,prezzoFruttoQ:58,costiFruttoHa:8500,raccoltaFruttoQ:11,impiantoFruttoHa:40000,ammFruttoAnni:18,anniImproduttivi:4,scartoFruttoPct:10},
+    ciliegie:{resaFruttoQHa:90,prezzoFruttoQ:230,costiFruttoHa:9500,raccoltaFruttoQ:45,impiantoFruttoHa:52000,ammFruttoAnni:18,anniImproduttivi:4,scartoFruttoPct:15},
+    albicocche:{resaFruttoQHa:180,prezzoFruttoQ:90,costiFruttoHa:7000,raccoltaFruttoQ:18,impiantoFruttoHa:32000,ammFruttoAnni:15,anniImproduttivi:3,scartoFruttoPct:14},
+    pesche:{resaFruttoQHa:260,prezzoFruttoQ:55,costiFruttoHa:7800,raccoltaFruttoQ:14,impiantoFruttoHa:35000,ammFruttoAnni:14,anniImproduttivi:3,scartoFruttoPct:12},
+    susine:{resaFruttoQHa:180,prezzoFruttoQ:70,costiFruttoHa:6200,raccoltaFruttoQ:13,impiantoFruttoHa:28000,ammFruttoAnni:15,anniImproduttivi:3,scartoFruttoPct:10},
+    noci:{resaFruttoQHa:35,prezzoFruttoQ:420,costiFruttoHa:2800,raccoltaFruttoQ:35,impiantoFruttoHa:22000,ammFruttoAnni:25,anniImproduttivi:6,scartoFruttoPct:6},
+    nocciole:{resaFruttoQHa:28,prezzoFruttoQ:360,costiFruttoHa:2400,raccoltaFruttoQ:30,impiantoFruttoHa:18000,ammFruttoAnni:22,anniImproduttivi:5,scartoFruttoPct:7},
+    castagne:{resaFruttoQHa:25,prezzoFruttoQ:280,costiFruttoHa:1800,raccoltaFruttoQ:45,impiantoFruttoHa:12000,ammFruttoAnni:30,anniImproduttivi:8,scartoFruttoPct:12},
+    olivo:{resaFruttoQHa:45,prezzoFruttoQ:95,costiFruttoHa:2300,raccoltaFruttoQ:25,impiantoFruttoHa:16000,ammFruttoAnni:25,anniImproduttivi:5,scartoFruttoPct:5},
+    vite:{resaFruttoQHa:110,prezzoFruttoQ:85,costiFruttoHa:6500,raccoltaFruttoQ:18,impiantoFruttoHa:35000,ammFruttoAnni:25,anniImproduttivi:3,scartoFruttoPct:6}
+  };
+  const forestPresets={
+    ceduo:{ricavoBoscoHa:160,costiBoscoHa:70,contributiBoscoHa:0,boscoPascolabilePct:20,resaBoscoSS:.5},
+    alto_fusto:{ricavoBoscoHa:90,costiBoscoHa:80,contributiBoscoHa:20,boscoPascolabilePct:15,resaBoscoSS:.35},
+    misto:{ricavoBoscoHa:120,costiBoscoHa:65,contributiBoscoHa:10,boscoPascolabilePct:25,resaBoscoSS:.6},
+    castagneto:{ricavoBoscoHa:250,costiBoscoHa:140,contributiBoscoHa:30,ricaviProdottiBosco:1500,boscoPascolabilePct:20,resaBoscoSS:.5},
+    silvopascolo:{ricavoBoscoHa:60,costiBoscoHa:90,contributiBoscoHa:50,boscoPascolabilePct:65,resaBoscoSS:1.2}
+  };
+  const agriPresets={
+    nessuno:{haAgriFV:0,potenzaMWp:0,canoneAgriFVHa:0},
+    affitto:{canoneAgriFVHa:2500,potenzaMWp:0,investFVMWp:0,omFVMWp:0,perditaAgricolaFVPct:15},
+    proprio:{potenzaMWp:1,mwhPerMWp:1200,prezzoEnergiaMWh:90,investFVMWp:800000,omFVMWp:18000,ammFVAnni:25,perditaAgricolaFVPct:10},
+    comunita:{potenzaMWp:.5,mwhPerMWp:1150,prezzoEnergiaMWh:110,investFVMWp:850000,omFVMWp:20000,ammFVAnni:25,perditaAgricolaFVPct:8}
+  };
+  const maps={regime:regimePresets,tipoProgetto:projectPresets,canaleVendita:channelPresets,indirizzoBovino:bovinePresets,razzaBovina:breedPresets,dieta:dietPresets,colturaTipo:cropPresets,fruttoTipo:fruitPresets,boscoTipo:forestPresets,agrivoltaicoModello:agriPresets};
+  const selected=val(source);
+  const preset=maps[source] ? maps[source][selected] : null;
+  if(!preset)return;
+  Object.entries(preset).forEach(([id,value])=>smartSet(id,value));
+  if(force || val('smartMode')==='assistita') showPresetToast(source,selected);
+}
+function showPresetToast(source,selected){
+  let box=document.getElementById('presetToast');
+  if(!box){box=document.createElement('div');box.id='presetToast';box.style.cssText='position:fixed;right:18px;bottom:18px;z-index:9999;background:#1f2a1f;color:white;padding:12px 14px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.25);font-weight:800;font-size:13px;max-width:320px';document.body.appendChild(box)}
+  box.textContent='✨ Preset applicato: '+source+' → '+selected+'. Puoi modificare ogni campo a mano.';
+  clearTimeout(window.__presetToastTimer); window.__presetToastTimer=setTimeout(()=>box.remove(),3200);
+}
+function renderTable(id,rows){document.getElementById(id).innerHTML=rows.map(([k,v])=>row(k,v)).join('')}
+function toggle(id, show){const el=document.getElementById(id); if(el)el.classList.toggle('is-hidden', !show)}
+function hasAnimals(){return val('attivaBovini')==='si'||num('vaccheNutrici')>0||num('tori')>0||num('oviniN')>0||num('capreN')>0||num('equidiN')>0}
+function updateVisibility(){
+  const bovini=val('attivaBovini')==='si'||num('boviniVenduti')>0;
+  const mandria=num('vaccheNutrici')>0||num('tori')>0||val('indirizzoBovino')==='vacca_vitello'||val('indirizzoBovino')==='linea_completa';
+  const ovini=num('oviniN')>0, capre=num('capreN')>0, equidi=num('equidiN')>0;
+  const animali=hasAnimals();
+  toggle('animalEmptyState', !animali);
+  toggle('cardBovini', bovini || val('attivaBovini')==='si');
+  toggle('cardMandria', mandria);
+  toggle('cardAltreSpecie', true);
+  toggle('cardCostiZoo', animali);
+  const species=val('animalDetailSpecies');
+  toggle('detailBovini', animali && species==='bovini' && (bovini||mandria));
+  toggle('detailOvini', animali && species==='ovini' && ovini);
+  toggle('detailCapre', animali && species==='capre' && capre);
+  toggle('detailEquidi', animali && species==='equidi' && equidi);
+  const badges=[];
+  if(bovini||mandria)badges.push('Bovini'); if(ovini)badges.push('Ovini'); if(capre)badges.push('Capre'); if(equidi)badges.push('Equidi');
+  const b=document.getElementById('activeSpeciesBadges'); if(b)b.innerHTML=badges.length?badges.map(x=>'<span class="species-badge">'+x+'</span>').join(''):'<span class="hint">Nessuna specie attiva.</span>';
+}
+function renderAnimalDetails(r){
+  const species=val('animalDetailSpecies');
+  let note='';
+  if(species==='bovini'){
+    document.getElementById('schedaRazza').innerHTML='<b>'+r.raz.nome+'</b><br>'+r.raz.desc;
+    renderTable('tabRazza',[['IMG usato',r.img.toFixed(2)+' kg/giorno'],['Peso vendita stimato',fmt.format(r.pesoVend)+' kg'],['Resa carcassa',r.resa.toFixed(1)+'%'],['Carcassa stimata',fmt.format(r.kgCarc)+' kg'],['UBA razza',r.raz.uba.toFixed(2)],['Acqua annua bovini',fmt.format((r.bovVend*num('litriBovinoGiorno')+num('vaccheNutrici')*num('litriVaccaGiorno')+num('tori')*65)*365/1000)+' m³']]);
+    note='I bovini hanno grande impatto su foraggi, acqua, recinzioni, macello e capitale immobilizzato. La resa carcassa non coincide con carne vendibile.';
+  }
+  if(species==='ovini'){
+    document.getElementById('schedaRazza').innerHTML='<b>Ovini - '+val('tipoOvino')+'</b><br>Specie leggera, adatta a pascolo fine e gestione di superfici erbose. Attenzione a predazione, parassiti e gestione gregge.';
+    const ss=num('oviniN')*num('pesoOvino')*num('consumoSSOvinoPct')/100*365;
+    renderTable('tabRazza',[['Capi ovini',fmt.format(num('oviniN'))],['UBA totali ovini',(num('oviniN')*num('ubaOvino')).toFixed(2)],['SS annua stimata',fmt.format(ss)+' kg'],['Acqua annua',fmt.format(num('oviniN')*num('litriOvinoGiorno')*365/1000)+' m³'],['Costi sanitari annui',euro(num('oviniN')*num('vetOvino'))]]);
+    note='Gli ovini sono utili nel pascolo misto, ma in aree con lupo o cani vaganti servono recinzioni, cani da guardiania o ricoveri adeguati.';
+  }
+  if(species==='capre'){
+    document.getElementById('schedaRazza').innerHTML='<b>Capre - '+val('tipoCapra')+'</b><br>Molto efficaci su arbusti, rovi e sottobosco leggero. Sono però tra gli animali più difficili da contenere.';
+    const ss=num('capreN')*num('pesoCapra')*num('consumoSSCapraPct')/100*365;
+    renderTable('tabRazza',[['Capi caprini',fmt.format(num('capreN'))],['UBA totali capre',(num('capreN')*num('ubaCapra')).toFixed(2)],['SS annua stimata',fmt.format(ss)+' kg'],['Acqua annua',fmt.format(num('capreN')*num('litriCapraGiorno')*365/1000)+' m³'],['Costi sanitari annui',euro(num('capreN')*num('vetCapra'))]]);
+    note='Le capre aumentano la pressione sulle recinzioni: rete ben tesa, elettrico ben mantenuto e controllo frequente sono quasi obbligatori.';
+  }
+  if(species==='equidi'){
+    document.getElementById('schedaRazza').innerHTML='<b>Equidi - '+val('tipoEquide')+'</b><br>Asini, cavalli e muli possono avere funzioni di lavoro, compagnia o guardiania, ma spesso sono una voce di costo più che di ricavo.';
+    const ss=num('equidiN')*num('pesoEquide')*num('consumoSSEquidePct')/100*365;
+    renderTable('tabRazza',[['Equidi',fmt.format(num('equidiN'))],['UBA totali equidi',(num('equidiN')*num('ubaEquide')).toFixed(2)],['SS annua stimata',fmt.format(ss)+' kg'],['Acqua annua',fmt.format(num('equidiN')*num('litriEquideGiorno')*365/1000)+' m³'],['Cura piedi + vet',euro(num('equidiN')*(num('maniscalcoEquide')+num('vetEquide')))]])
+    note='Per equidi considera sempre zoccoli, denti, ricovero, documenti, gestione fango e fieno di qualità adeguata.';
+  }
+  const n=document.getElementById('animalManagementNote'); if(n)n.textContent=note||'Seleziona una specie attiva per vedere dettagli specifici.';
+}
+function addGuidance(){
+  const intros={
+    sintesi:['Cruscotto decisionale','Qui vedi subito se il progetto sta in piedi: ricavi, costi, margine, netto, payback, indicatori tecnici e criticità.'],
+    azienda:['Impostazioni aziendali','Definisci regime, obiettivo, contributi e canale vendita. Questi campi influenzano margini, rischi e report finale.'],
+    superfici:['Superfici e potenziale produttivo','Inserisci la fotografia dell’azienda: ettari, pascoli, boschi, frutteti e geometria. Da qui derivano foraggio, perimetri e contributi.'],
+    allevamento:['Modulo zootecnico','Gestisci bovini, mandria fattrice e altre specie. I costi animali e i ricavi carne dipendono da questa sezione.'],
+    razze:['Razze bovine e performance','Scegli una razza o inserisci valori manuali. Peso, incremento medio giornaliero, resa carcassa e UBA cambiano molto il risultato.'],
+    alimentazione:['Alimentazione e fabbisogno','Stima foraggi, balloni, dieta, concentrati, minerali e lettiera. È spesso la voce che decide utile o perdita.'],
+    colture:['Colture erbacee','Simula seminativi, foraggi, seconda coltura, rese, prezzi e contoterzisti.'],
+    frutteti:['Frutteti e colture permanenti','Calcola resa, prezzo, raccolta, scarti, investimento impianto e ammortamento.'],
+    bosco:['Bosco e servizi ecosistemici','Valuta legna, castagne, funghi, carbonio, contributi forestali e costi di manutenzione.'],
+    agrivoltaico:['Agrivoltaico ed energia','Confronta affitto terreno, impianto proprio o comunità energetica.'],
+    strutture:['Strutture e investimenti','Recinti, stalle, fienili, macchine, acqua e ammortamenti: qui emergono i costi fissi veri.'],
+    tasse:['Fiscalità gestionale','Stima imposte, contributi, burocrazia e costi generali. La fiscalità reale va sempre verificata.'],
+    cashflow:['Flussi di cassa mensili','Non basta essere in utile: bisogna capire quando entrano e quando escono i soldi.'],
+    rischi:['Stress test','Simula cosa succede se il mercato peggiora, il fieno sale, le rese calano o aumentano gli scarti.'],
+    report:['Report finale','Genera una scheda leggibile da stampare, copiare o discutere con consulente, socio o banca.'],
+    fonti:['Metodo & fonti','Qui trovi criteri, livello di attendibilità e riferimenti usati per costruire i valori di partenza.'],
+    scenari:['Scenari salvabili','Salva versioni diverse del progetto e confronta alternative.']
+  };
+  Object.entries(intros).forEach(([id,[h,p]])=>{const sec=document.getElementById(id); if(!sec||sec.dataset.guided)return; const div=document.createElement('div'); div.className='section-intro'; div.innerHTML=`<h2>${h}</h2><p>${p}</p>`; const grid=sec.querySelector('.grid'); if(grid)grid.prepend(div); sec.dataset.guided='1';});
+  const help={
+    pacBaseHa:'Valore annuo per ettaro. Inserisci solo se conosci titoli o stima prudente.', premioRegimeHa:'Premio aggiuntivo per biologico/integrato, se applicabile.', ecoHa:'Eventuali ecoschemi o premi pascolo: verifica ammissibilità reale.', invendutoPct:'Quota di prodotto non venduta, scontata o autoconsumata.', haSeminativi:'Ettari arabili: cereali, foraggi, rotazioni, erbai.', haPascoli:'Prati permanenti o pascoli realmente utilizzabili.', boscoPascolabilePct:'Quota di bosco accessibile e con cotico/risorse utilizzabili dagli animali.', resaPascoloSS:'Tonnellate di sostanza secca prodotte per ettaro/anno.', effForaggioPct:'Parte realmente mangiata: il resto è calpestio, scarto, residuo o non accessibile.', boviniVenduti:'Numero di capi che prevedi di vendere o macellare ogni anno.', ricavoBovino:'Ricavo medio per capo: carne, vivo, mezzena o vendita diretta.', mortalitaBoviniPct:'Margine prudenziale per mortalità, scarti, problemi sanitari o mancata vendita.', tassoSvezzamento:'Vitelli svezzati rispetto alle vacche: fertilità, aborti e mortalità vitelli incidono molto.', razzaBovina:'La razza modifica crescita, resa carcassa e carico UBA.', imgManuale:'Se lasci 0 usa la stima automatica della razza e dieta.', resaCarcassaManuale:'Se lasci 0 usa la resa media della razza selezionata.', consumoSSPct:'Consumo giornaliero in sostanza secca in % del peso vivo.', prezzoBallone:'Costo del ballone comprato o costo-opportunità se prodotto in azienda.', kgConcentratiGiorno:'Per grass-fed puro lascia 0. Per finissaggio inserisci integrazione giornaliera.', resaColturaTHa:'Produzione vendibile per ettaro: usa medie locali prudenti.', costiColturaHa:'Sementi, concimi, lavorazioni, irrigazione, difesa, gasolio.', resaFruttoQHa:'Quintali vendibili per ettaro a regime.', impiantoFruttoHa:'Costo di realizzazione: piante, pali, irrigazione, reti, preparazione suolo.', scartoFruttoPct:'Grandine, calibri, difetti, invenduto, selezione.', ricavoBoscoHa:'Ricavo medio annuo normalizzato: utile se il taglio è periodico.', haAgriFV:'Superficie occupata o interessata dal progetto energetico.', canoneAgriFVHa:'Canone annuo se affitti a operatore.', reteFissaM:'Costo completo al metro: rete, pali, posa, accessori se possibile.', investStalla:'Investimento iniziale da ammortizzare, non costo annuo immediato.', metodoTasse:'Serve solo per simulazione gestionale; non è consulenza fiscale.', manodopera:'Valorizza anche il tuo lavoro, altrimenti il margine può illudere.', incassoSubitoPct:'Quota ricavi incassata nel mese principale; il resto slitta al mese dopo.', scartoFienoPct:'Quota persa tra stoccaggio, distribuzione, pioggia, calpestio e scarti in mangiatoia.', costoFienoProprio:'Se produci fieno internamente, inserisci il costo pieno per ballone. Se lasci 0 usa il prezzo di acquisto.', ubaOvino:'Coefficiente UBA/LSU modificabile. Eurostat usa 0,10 per ovini e caprini.', ubaCapra:'Coefficiente UBA/LSU modificabile. Eurostat usa 0,10 per ovini e caprini.', ubaEquide:'Coefficiente UBA/LSU modificabile. Eurostat usa 0,80 per equidi.', kgNPerUBA:'Stima gestionale dell’azoto prodotto per UBA/anno: da verificare con piano effluenti locale.', limiteNHa:'Limite gestionale impostato per controllare il carico di azoto per ettaro.', haSpandimento:'Superficie utile su cui distribuire gli effluenti o calcolare il carico azotato.'
+  };
+  Object.entries(help).forEach(([id,text])=>{const el=document.getElementById(id); if(!el||el.dataset.helped)return; const lab=el.closest('label'); if(!lab)return; const q=document.createElement('span'); q.className='q'; q.textContent='?'; q.title=text; lab.appendChild(q); const small=document.createElement('span'); small.className='field-help'; small.textContent=text; lab.insertAdjacentElement('afterend',small); el.dataset.helped='1';});
+}
+function calcola(){addGuidance();const r=compute();
+  document.getElementById('topRicavi').textContent=euro(r.ricavi);document.getElementById('topNetto').textContent=euro(r.netto);document.getElementById('topNetto').className=r.netto>=0?'positive':'negative';document.getElementById('topPayback').textContent=isFinite(r.payback)?r.payback.toFixed(1)+' anni':'-';
+  document.getElementById('outRicavi').textContent=euro(r.ricavi);document.getElementById('outCosti').textContent=euro(r.costi);document.getElementById('outMargine').textContent=euro(r.margine);document.getElementById('outMargine').className=r.margine>=0?'positive':'negative';document.getElementById('outMarginePct').textContent='Margine '+pct(r.ricavi?100*r.margine/r.ricavi:0);document.getElementById('outNetto').textContent=euro(r.netto);document.getElementById('outNetto').className=r.netto>=0?'positive':'negative';document.getElementById('outPayback').textContent=isFinite(r.payback)?r.payback.toFixed(1)+' anni':'-';
+  const d=document.getElementById('diagnosi');let msg=[];if(r.netto<0)msg.push('Scenario in perdita netta.');if(r.ubaHa>1.4)msg.push('Carico animale elevato per estensivo.');if(r.kgNHa>num('limiteNHa'))msg.push('Azoto stimato oltre il limite impostato.');if(r.balloni>250)msg.push('Forte dipendenza da fieno acquistato.');if(r.ricavi>0&&r.margine/r.ricavi<.12)msg.push('Margine sotto soglia di sicurezza.');if(!msg.length)msg.push('Scenario tecnicamente leggibile: controlla comunque prezzi reali, normative e autorizzazioni.');d.className='warn '+(r.netto>=0?'okbox':'dangerbox');d.textContent=msg.join(' ');
+  renderTable('tabRicavi',[['Bovini',euro(r.ricBov)],['Altre specie',euro(r.ricAltre)],['Colture erbacee',euro(r.ricColt)],['Frutteti',euro(r.ricFrutto)],['Bosco',euro(r.ricBosco)],['Agrivoltaico/energia',euro(r.ricFV)],['Contributi',euro(r.contributi)],['Totale ricavi netti invenduto',euro(r.ricavi)]]);
+  renderTable('tabCosti',[['Bovini',euro(r.costBov)],['Altre specie',euro(r.costAltre)],['Alimentazione/foraggi',euro(r.costForaggi)],['Colture',euro(r.costColt)],['Frutteti',euro(r.costFrutto)],['Bosco',euro(r.costBosco)],['Agrivoltaico',euro(r.costFV)],['Strutture/recinti/macchine/acqua',euro(r.costRec+r.costStr+r.costMac+r.costAcqua)],['Generali e fiscali indiretti',euro(r.costGenerali)],['Totale costi',euro(r.costi)]]);
+  renderTable('tabIndicatori',[['Superficie totale',r.haTot.toFixed(2)+' ha'],['Superficie contributi',r.haContributi.toFixed(2)+' ha'],['Perimetro stimato',fmt.format(r.peri)+' m'],['Capi bovini venduti',fmt.format(r.bovVend)],['Vitelli prodotti stimati',r.vitelli.toFixed(1)],['Capi da comprare',r.capiDaComprare.toFixed(1)],['Peso vendita bovino stimato',fmt.format(r.pesoVend)+' kg'],['Resa carcassa stimata',r.resa.toFixed(1)+'%'],['Carcassa/capo stimata',fmt.format(r.kgCarc)+' kg'],['Foraggio SS disponibile',fmt.format(r.ssDisponibile)+' kg'],['Foraggio SS richiesto',fmt.format(r.ssTot)+' kg'],['Balloni stimati',fmt.format(r.balloni)],['UBA totali',r.uba.toFixed(2)],['UBA/ha foraggero',r.ubaHa.toFixed(2)],['Investimento stimato',euro(r.investimento)],['Tasse stimate',euro(r.tasse)],['Azoto stimato',r.kgNHa.toFixed(1)+' kg N/ha'],['Limite N impostato',num('limiteNHa').toFixed(0)+' kg N/ha']]);
+  document.getElementById('schedaRazza').innerHTML='<b>'+r.raz.nome+'</b><br>'+r.raz.desc; renderTable('tabRazza',[['IMG usato',r.img.toFixed(2)+' kg/giorno'],['Peso vendita stimato',fmt.format(r.pesoVend)+' kg'],['Resa carcassa',r.resa.toFixed(1)+'%'],['Carcassa stimata',fmt.format(r.kgCarc)+' kg'],['UBA razza',r.raz.uba.toFixed(2)]]);
+  document.getElementById('schedaDieta').innerHTML='<b>'+val('dieta')+'</b><br>'+r.diet.desc;
+  renderTable('tabColture',[['Ricavi colture',euro(r.ricColt)],['Costi colture',euro(r.costColt)],['Margine colture',euro(r.ricColt-r.costColt)]]); renderTable('tabFrutteti',[['Produzione vendibile',r.qFrutto.toFixed(0)+' q'],['Ricavi frutteto',euro(r.ricFrutto)],['Costi frutteto',euro(r.costFrutto)],['Margine frutteto',euro(r.ricFrutto-r.costFrutto)]]); renderTable('tabBosco',[['Ricavi bosco',euro(r.ricBosco)],['Costi bosco',euro(r.costBosco)],['Margine bosco',euro(r.ricBosco-r.costBosco)]]); renderTable('tabAgriFV',[['Ricavi energia/canone',euro(r.ricFV)],['Costi energia',euro(r.costFV)],['Investimento FV',euro(r.investFV)],['Margine energia',euro(r.ricFV-r.costFV)]]); renderTable('tabTasse',[['Margine lordo',euro(r.margine)],['Tasse stimate',euro(r.tasse)],['INPS/contributi inseriti',euro(num('inps'))],['Netto stimato',euro(r.netto)]]);
+  renderCashflow(r); renderScenariAuto(); renderStressTests(); renderScenarioList();}
+function renderCashflow(r){const entr=Array(12).fill(0),usc=Array(12).fill(0),mr=num('meseRicavi')-1,mc=num('meseCostiGrossi')-1;entr[mr]+=r.ricavi*num('incassoSubitoPct')/100;entr[(mr+1)%12]+=r.ricavi*(1-num('incassoSubitoPct')/100);usc[mc]+=r.costi*num('costiConcentratiPct')/100;const rest=r.costi*(1-num('costiConcentratiPct')/100)/12;for(let i=0;i<12;i++)usc[i]+=rest;let cum=0;document.getElementById('tabCashflow').innerHTML=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'].map((m,i)=>{const s=entr[i]-usc[i];cum+=s;return `<tr><td>${m}</td><td>${euro(entr[i])}</td><td>${euro(usc[i])}</td><td class="${s>=0?'positive':'negative'}">${euro(s)}</td><td class="${cum>=0?'positive':'negative'}">${euro(cum)}</td></tr>`}).join('')}
+function applyWizardPreset(type){
+  const ha=num('wizardHa')||25, budget=num('wizardBudget')||50000, risk=val('wizardRischio');
+  const advice={
+    pascolo:'Impostato un progetto pascolo: controlla soprattutto UBA/ha, foraggio disponibile, balloni e recinzioni.',
+    carne:'Impostato bovini da carne: lavora su razza, peso vendita, ricavo/capo e costo alimentare.',
+    vacca:'Impostata linea vacca-vitello: verifica fertilità, tasso svezzamento e numero vacche sostenibili.',
+    frutteto:'Impostato frutteto: attenzione a investimento impianto, anni improduttivi, manodopera raccolta e rischio grandine.',
+    bosco:'Impostato bosco: utile per gestione conservativa, legna, prodotti secondari e contributi forestali.',
+    agrivoltaico:'Impostato agrivoltaico: scegli affitto terreno o impianto proprio e verifica autorizzazioni.',
+    misto:'Impostata azienda mista: diversifica ricavi ma aumenta complessità gestionale.',
+    vendita:'Impostata vendita diretta: aumenta potenziale margine ma richiede logistica, laboratorio, clienti e cashflow.'
+  };
+  if(type==='pascolo'){setVal('tipoProgetto','misto');setVal('haPascoli',ha*.55);setVal('haSeminativi',ha*.25);setVal('haBosco',ha*.20);setVal('boviniVenduti',risk==='aggressivo'?28:18);setVal('attivaBovini','si');setVal('indirizzoBovino','carne_ingrasso');setVal('areaRecintataHa',ha*.8);}
+  if(type==='carne'){setVal('tipoProgetto','solo_allevamento');setVal('attivaBovini','si');setVal('indirizzoBovino','carne_ingrasso');setVal('boviniVenduti',risk==='prudente'?15:risk==='medio'?22:32);setVal('ricavoBovino',5200);setVal('haPascoli',ha*.45);setVal('haSeminativi',ha*.35);}
+  if(type==='vacca'){setVal('tipoProgetto','solo_allevamento');setVal('attivaBovini','si');setVal('indirizzoBovino','linea_completa');setVal('vaccheNutrici',risk==='prudente'?12:risk==='medio'?20:30);setVal('tori',1);setVal('boviniVenduti',risk==='prudente'?10:risk==='medio'?17:25);}
+  if(type==='frutteto'){setVal('tipoProgetto','frutticolo');setVal('attivaBovini','no');setVal('haFrutteto',ha*.6);setVal('haFruttetoCalc',ha*.6);setVal('haColtura',0);setVal('investLaboratorio',budget*.15);}
+  if(type==='bosco'){setVal('tipoProgetto','forestale');setVal('attivaBovini','no');setVal('haBosco',ha*.8);setVal('haBoscoCalc',ha*.8);setVal('ricavoBoscoHa',risk==='aggressivo'?250:120);}
+  if(type==='agrivoltaico'){setVal('tipoProgetto','energia');setVal('agrivoltaicoModello','affitto');setVal('haAgriFV',ha*.35);setVal('canoneAgriFVHa',2500);setVal('attivaBovini','no');}
+  if(type==='misto'){setVal('tipoProgetto','misto');setVal('attivaBovini','si');setVal('haSeminativi',ha*.35);setVal('haPascoli',ha*.30);setVal('haBosco',ha*.20);setVal('haFrutteto',ha*.10);setVal('haFruttetoCalc',ha*.10);setVal('boviniVenduti',risk==='prudente'?12:risk==='medio'?20:28);}
+  if(type==='vendita'){setVal('canaleVendita','diretta');setVal('marketing',risk==='prudente'?1000:4000);setVal('logisticaCommerciale',3500);setVal('investLaboratorio',budget*.25);setVal('ricavoBovino',6000);setVal('invendutoPct',5);}
+  document.getElementById('wizardAdvice').textContent=advice[type]||'Preset applicato.';
+  calcola(); switchTab('sintesi');
+}
+function switchTab(id){const tab=[...document.querySelectorAll('.tab')].find(t=>t.dataset.tab===id); if(tab)tab.click();}
+function renderStressTests(){const base=compute();
+  const tests=[
+    ['Base',{}],['Fieno +30%',{prezzoBallone:num('prezzoBallone')*1.3}],['Ricavi -20%',{ricavoBovino:num('ricavoBovino')*.8,prezzoColturaT:num('prezzoColturaT')*.8,prezzoFruttoQ:num('prezzoFruttoQ')*.8,prezzoEnergiaMWh:num('prezzoEnergiaMWh')*.8}],['Costi colture/frutteto +25%',{costiColturaHa:num('costiColturaHa')*1.25,costiFruttoHa:num('costiFruttoHa')*1.25}],['Rese colture/frutti -35%',{resaColturaTHa:num('resaColturaTHa')*.65,resaFruttoQHa:num('resaFruttoQHa')*.65}],['Mortalità/scarti +5 punti',{mortalitaBoviniPct:num('mortalitaBoviniPct')+5,scartoFruttoPct:num('scartoFruttoPct')+5}],['Scenario ottimistico',{ricavoBovino:num('ricavoBovino')*1.15,prezzoBallone:num('prezzoBallone')*.9,resaColturaTHa:num('resaColturaTHa')*1.1,resaFruttoQHa:num('resaFruttoQHa')*1.1}]
+  ];
+  const rows=tests.map(([name,ov])=>[name,compute(ov)]); const worst=rows.reduce((a,b)=>b[1].netto<a[1].netto?b:a,rows[0]); const best=rows.reduce((a,b)=>b[1].netto>a[1].netto?b:a,rows[0]);
+  const score=Math.max(0,Math.min(100,Math.round(50+(base.netto/(Math.max(base.ricavi,1))*120)-(base.ubaHa>1.4?12:0)-(base.payback>8?12:0)-(worst[1].netto<0?18:0))));
+  const sc=document.getElementById('riskScore'); if(sc){sc.textContent=score; sc.className='score '+(score>=70?'good':score>=45?'mid':'bad');}
+  if(document.getElementById('riskScoreText'))document.getElementById('riskScoreText').textContent=score>=70?'solido':score>=45?'da migliorare':'fragile';if(document.getElementById('topScore')){document.getElementById('topScore').textContent=score+'/100';document.getElementById('topScore').className=score>=70?'positive':score>=45?'warning':'negative';}
+  if(document.getElementById('worstScenario'))document.getElementById('worstScenario').textContent=euro(worst[1].netto);
+  if(document.getElementById('bestScenario'))document.getElementById('bestScenario').textContent=euro(best[1].netto);
+  const feed=compute({prezzoBallone:num('prezzoBallone')*1.3}).netto-base.netto; if(document.getElementById('feedSensitivity'))document.getElementById('feedSensitivity').textContent=euro(feed);
+  if(document.getElementById('cashBuffer'))document.getElementById('cashBuffer').textContent=euro(Math.max(base.costi*.20,Math.abs(worst[1].netto-base.netto)));
+  if(document.getElementById('tabStress'))document.getElementById('tabStress').innerHTML=rows.map(([n,r])=>`<tr><td>${n}</td><td>${euro(r.ricavi)}</td><td>${euro(r.costi)}</td><td class="${r.netto>=0?'positive':'negative'}">${euro(r.netto)}</td><td class="${r.netto-base.netto>=0?'positive':'negative'}">${euro(r.netto-base.netto)}</td></tr>`).join('');
+  const risks=[]; if(base.ubaHa>1.4)risks.push('Carico animale alto.'); if(base.kgNHa>num('limiteNHa'))risks.push('Azoto/ha oltre limite impostato.'); if(base.balloni>250)risks.push('Dipendenza elevata da fieno acquistato.'); if(base.payback>8)risks.push('Rientro investimento lento.'); if(worst[1].netto<0)risks.push('Lo scenario peggiore porta perdita.'); if(base.margine/base.ricavi<.15)risks.push('Margine operativo sottile.');
+  if(document.getElementById('riskMap'))document.getElementById('riskMap').textContent=risks.length?risks.join(' '):'Profilo rischio buono con i valori attuali.';
+}
+function generateReport(goTab=false){const r=compute(); const scoreEl=document.getElementById('riskScore'); const score=scoreEl?scoreEl.textContent:'-'; const html=`
+  <h1>Business plan sintetico - ${val('nomeScenario')||val('scenarioName')||'Scenario agricolo'}</h1>
+  <p><b>Tipo progetto:</b> ${val('tipoProgetto')} · <b>Regime:</b> ${val('regime')} · <b>Canale vendita:</b> ${val('canaleVendita')}</p>
+  <h2>1. Sintesi economica</h2>
+  <ul><li>Ricavi annui stimati: <b>${euro(r.ricavi)}</b></li><li>Costi annui stimati: <b>${euro(r.costi)}</b></li><li>Margine lordo: <b>${euro(r.margine)}</b></li><li>Utile netto stimato: <b>${euro(r.netto)}</b></li><li>Investimento stimato: <b>${euro(r.investimento)}</b></li><li>Payback: <b>${isFinite(r.payback)?r.payback.toFixed(1)+' anni':'non recuperabile'}</b></li></ul>
+  <h2>2. Superfici e produzione</h2>
+  <ul><li>Superficie totale: <b>${r.haTot.toFixed(2)} ha</b></li><li>Superficie contributi: <b>${r.haContributi.toFixed(2)} ha</b></li><li>Foraggio disponibile: <b>${fmt.format(r.ssDisponibile)} kg SS</b></li><li>Balloni stimati: <b>${fmt.format(r.balloni)}</b></li></ul>
+  <h2>3. Allevamento</h2>
+  <ul><li>Bovini venduti/anno: <b>${fmt.format(r.bovVend)}</b></li><li>Razza bovina: <b>${r.raz.nome}</b></li><li>Peso vendita stimato: <b>${fmt.format(r.pesoVend)} kg</b></li><li>Carcassa stimata/capo: <b>${fmt.format(r.kgCarc)} kg</b></li><li>UBA/ha foraggero: <b>${r.ubaHa.toFixed(2)}</b></li></ul>
+  <h2>4. Ricavi principali</h2>
+  <ul><li>Bovini: <b>${euro(r.ricBov)}</b></li><li>Colture: <b>${euro(r.ricColt)}</b></li><li>Frutteti: <b>${euro(r.ricFrutto)}</b></li><li>Bosco: <b>${euro(r.ricBosco)}</b></li><li>Agrivoltaico/energia: <b>${euro(r.ricFV)}</b></li><li>Contributi: <b>${euro(r.contributi)}</b></li></ul>
+  <h2>5. Rischi e giudizio</h2>
+  <p>Score progetto: <b>${score}/100</b>. ${r.netto>=0?'Il progetto risulta in utile con i valori inseriti.':'Il progetto risulta in perdita con i valori inseriti.'}</p>
+  <p><b>Punti da verificare:</b> prezzi reali di vendita, costo manodopera, autorizzazioni, accesso ai contributi, fiscalità, vincoli su bosco/agrivoltaico, disponibilità acqua e sostenibilità del carico animale.</p>
+  <h2>6. Prossime azioni consigliate</h2>
+  <ul><li>Validare prezzi e rese con dati locali.</li><li>Creare scenario prudente, medio e aggressivo.</li><li>Verificare normative con tecnico agricolo e commercialista.</li><li>Controllare cashflow mensile prima di investire.</li></ul>`;
+  document.getElementById('businessReport').innerHTML=html; if(goTab)switchTab('report');
+}
+function copyReport(){
+  const el=document.getElementById('businessReport');
+  const text=el ? (el.innerText || '') : '';
+  if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(text);}
+}
+function renderScenariAuto(){const base=compute(), up=compute({ricavoBovino:num('ricavoBovino')*1.2,prezzoColturaT:num('prezzoColturaT')*1.2,prezzoFruttoQ:num('prezzoFruttoQ')*1.2}), cost=compute({prezzoBallone:num('prezzoBallone')*1.2,costiColturaHa:num('costiColturaHa')*1.2,costiFruttoHa:num('costiFruttoHa')*1.2}), less=compute({boviniVenduti:Math.max(0,num('boviniVenduti')*.75)}), fruit=compute({haFruttetoCalc:num('haFruttetoCalc')+1}); const arr=[['Base',base],['+20% prezzi vendita',up],['+20% costi chiave',cost],['-25% bovini',less],['+1 ha frutteto',fruit]];document.getElementById('tabScenarioAuto').innerHTML=arr.map(([n,r])=>`<tr><td>${n}</td><td>${euro(r.ricavi)}</td><td>${euro(r.costi)}</td><td class="${r.netto>=0?'positive':'negative'}">${euro(r.netto)}</td><td>${isFinite(r.payback)?r.payback.toFixed(1)+' anni':'-'}</td></tr>`).join('')}
+function salvaScenario(){const name=val('scenarioName')||val('nomeScenario')||'Scenario';const all=JSON.parse(localStorage.getItem('agriPlannerScenarios')||'{}');all[name]=capture();localStorage.setItem('agriPlannerScenarios',JSON.stringify(all));renderScenarioList()}
+function caricaScenario(n){const all=JSON.parse(localStorage.getItem('agriPlannerScenarios')||'{}');if(all[n])apply(all[n])}function eliminaScenario(n){const all=JSON.parse(localStorage.getItem('agriPlannerScenarios')||'{}');delete all[n];localStorage.setItem('agriPlannerScenarios',JSON.stringify(all));renderScenarioList()}
+function safeScenarioName(name){return encodeURIComponent(String(name))}
+function caricaScenarioSafe(encodedName){caricaScenario(decodeURIComponent(encodedName))}
+function eliminaScenarioSafe(encodedName){eliminaScenario(decodeURIComponent(encodedName))}
+function renderScenarioList(){
+  const box=document.getElementById('scenarioList');
+  if(!box)return;
+  const all=JSON.parse(localStorage.getItem('agriPlannerScenarios')||'{}');
+  const names=Object.keys(all);
+  if(!names.length){box.innerHTML='<span class="hint">Nessuno scenario salvato.</span>';return;}
+  box.innerHTML=names.map(function(n){
+    const safe=safeScenarioName(n);
+    return '<span class="chip" onclick="caricaScenarioSafe(\''+safe+'\')">'+n+'</span><span class="chip" onclick="eliminaScenarioSafe(\''+safe+'\')">elimina</span>';
+  }).join('');
+}
+function esportaJSON(){const blob=new Blob([JSON.stringify(capture(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(val('scenarioName')||'scenario')+'.json';a.click()}function importaJSON(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{apply(JSON.parse(rd.result))}catch(err){alert('JSON non valido')}};rd.readAsText(f)}
+const demoValues={
+  nomeScenario:'Esempio demo azienda mista',scenarioName:'Esempio demo azienda mista',wizardHa:25,wizardBudget:50000,wizardRischio:'medio',wizardObiettivo:'reddito',smartMode:'manuale',
+  regime:'convenzionale',tipoProgetto:'misto',anniAnalisi:10,inflazioneCosti:2.5,crescitaPrezzi:1.5,pacBaseHa:0,premioRegimeHa:0,ecoHa:0,altriContributi:0,canaleVendita:'diretta',marketing:0,logisticaCommerciale:1500,invendutoPct:3,
+  haSeminativi:10,haPascoli:10,haBosco:5,haFrutteto:2,haPermanenti:0,haFabbricati:0.3,boscoPascolabilePct:30,resaPascoloSS:3.5,resaSeminativoSS:5,resaBoscoSS:0.8,effForaggioPct:55,areaRecintataHa:20,forma:'compatta',perimetroManuale:0,divisioniInterneM:1000,
+  attivaBovini:'si',indirizzoBovino:'carne_ingrasso',boviniVenduti:20,costoAcquistoBovino:1200,ricavoBovino:5000,mortalitaBoviniPct:3,vaccheNutrici:0,tori:0,tassoSvezzamento:85,rimontaCapi:0,costoVaccaAnno:850,costoToroAnno:1200,
+  oviniN:0,ricavoOvino:0,costoOvino:90,capreN:0,ricavoCapra:0,costoCapra:120,equidiN:0,costoEquide:350,ubaOvino:0.10,ubaCapra:0.10,ubaEquide:0.80,vetBovino:120,assBovino:40,macelloBovino:500,trasportoBovino:150,
+  razzaBovina:'angus',pesoAcquisto:280,etaAcquisto:8,etaVendita:19,imgManuale:0,resaCarcassaManuale:0,dieta:'grassfed',consumoSSPct:2.35,pesoBallone:450,ssBallonePct:85,prezzoBallone:130,balloniManuali:0,scartoFienoPct:10,costoFienoProprio:0,kgConcentratiGiorno:0,costoConcentratiKg:0.45,mineraliCapo:35,lettieraCapo:60,
+  colturaTipo:'grano',haColtura:5,resaColturaTHa:5,prezzoColturaT:220,costiColturaHa:650,contoterziColturaHa:250,secondaColturaOn:'no',haColtura2:0,resaColtura2THa:3,prezzoColtura2T:180,costiColtura2Ha:400,
+  fruttoTipo:'mele',haFruttetoCalc:2,resaFruttoQHa:180,prezzoFruttoQ:65,costiFruttoHa:4500,raccoltaFruttoQ:12,impiantoFruttoHa:25000,ammFruttoAnni:15,anniImproduttivi:3,produzioneRegimePct:100,scartoFruttoPct:8,
+  boscoTipo:'ceduo',haBoscoCalc:5,ricavoBoscoHa:120,costiBoscoHa:60,contributiBoscoHa:0,ricaviProdottiBosco:0,ricaviFunghi:0,ricaviCarbonio:0,costiSentieri:0,
+  agrivoltaicoModello:'nessuno',haAgriFV:0,canoneAgriFVHa:2500,potenzaMWp:0,mwhPerMWp:1200,prezzoEnergiaMWh:90,investFVMWp:800000,omFVMWp:18000,ammFVAnni:25,perditaAgricolaFVPct:10,
+  reteFissaM:8,elettricoM:0.8,extraRecinti:2500,ammRecintiAnni:12,manutRecintiPct:4,investStalla:0,investFienile:0,investLaboratorio:0,ammStruttureAnni:20,manutStrutture:1000,investMacchine:20000,ammMacchineAnni:10,gasolioEnergia:2500,investAcqua:2500,prezzoAcquaMc:1.8,litriBovinoGiorno:55,litriVaccaGiorno:45,litriEquideGiorno:25,
+  metodoTasse:'percentuale',aliquotaFiscalePct:25,tasseManuali:0,inps:0,commercialista:1800,assicurazioni:1200,burocrazia:1500,manodopera:0,imprevisti:3000,kgNPerUBA:70,limiteNHa:170,haSpandimento:20,meseRicavi:1,meseCostiGrossi:1,incassoSubitoPct:80,costiConcentratiPct:45
+};
+function clearProject(){
+  document.querySelectorAll('input,textarea').forEach(function(el){if(el.type==='file')return; el.value='';});
+  setVal('smartMode','manuale'); setVal('regime','convenzionale'); setVal('tipoProgetto','misto'); setVal('canaleVendita','diretta'); setVal('attivaBovini','no'); setVal('indirizzoBovino','carne_ingrasso'); setVal('razzaBovina','custom'); setVal('dieta','grassfed'); setVal('colturaTipo','custom'); setVal('secondaColturaOn','no'); setVal('fruttoTipo','custom'); setVal('boscoTipo','misto'); setVal('agrivoltaicoModello','nessuno'); setVal('metodoTasse','zero'); setVal('forma','compatta'); setVal('wizardRischio','prudente'); setVal('wizardObiettivo','reddito');
+  document.getElementById('wizardAdvice').textContent='Scheda vuota: inserisci i dati a mano oppure scegli un modello guidato.';
+  calcola();
+}
+function loadDemoProject(){apply(demoValues);document.getElementById('wizardAdvice').textContent='Esempio demo caricato: usa questi numeri solo per vedere come funziona il simulatore.';}
+function resetDefault(){clearProject()}
+document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.id)defaults[el.id]=el.value;el.addEventListener('input',calcola);el.addEventListener('change',()=>{applySmartPreset(el.id);calcola()})});document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active');const js=document.getElementById('jumpSelect');if(js)js.value=t.dataset.tab;window.scrollTo({top:0,behavior:'smooth'});}));calcola();
+</script>
+</body>
+</html>
